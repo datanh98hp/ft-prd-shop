@@ -19,29 +19,29 @@ services:
       - '8001:8001'
     networks:
       - my_network
-  # fe:
-  #   container_name: fe
-  #   build: 
-  #     context: ./fe
-  #     dockerfile: ./dev.Dockerfile #path Dockerfile in container
-  #   environment:
-  #     ENV_VARIABLE: ${ENV_VARIABLE}
-  #     NEXT_PUBLIC_ENV_VARIABLE: ${NEXT_PUBLIC_ENV_VARIABLE}
-  #   command: npm run dev
-  #   env_file:
-  #     - .env
-  #   depends_on:
-  #     - be
-  #   volumes:
-  #     - ./fe/src/app:/app/src/app
-  #     - ./fe/public:/app/public
-  #     # - /fe/tailwind.config.ts
-  #     # - /fe/postcss.config.js
-  #   restart: always
-  #   ports:
-  #     - '3000:3000'
-  #   networks:
-  #     - my_network
+  fe:
+    container_name: fe
+    build: 
+      context: ./fe
+      dockerfile: ./dev.Dockerfile #path Dockerfile in container
+    environment:
+      ENV_VARIABLE: ${ENV_VARIABLE}
+      NEXT_PUBLIC_ENV_VARIABLE: ${NEXT_PUBLIC_ENV_VARIABLE}
+    command: npm run dev
+    env_file:
+      - .env
+    depends_on:
+      - be
+    volumes:
+      - ./fe/src/app:/app/src/app
+      - ./fe/public:/app/public
+      # - /fe/tailwind.config.ts
+      # - /fe/postcss.config.js
+    restart: always
+    ports:
+      - '3000:3000'
+    networks:
+      - my_network
 
   db:
     image: postgres:latest
