@@ -3,6 +3,19 @@
   "collection": "@nestjs/schematics",
   "sourceRoot": "src",
   "compilerOptions": {
-    "deleteOutDir": true
+    "deleteOutDir": true,
+    "assets": [
+      {
+        "include": "../upload",
+        "outDir": "dist/upload",
+        "watchAssets": true
+      },
+      {
+        "include": "../upload",
+        "outDir": "dist/banners",
+        "watchAssets": true
+      }
+    ],
+    "watchAssets": true
   }
 }
