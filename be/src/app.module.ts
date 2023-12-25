@@ -5,11 +5,18 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { AboutModule } from './about/about.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import path, { join } from 'path';
 
 
 @Module({
   imports: [
-    // ConfigModule.forRoot(),
+    // ServeStaticModule.forRoot({
+    //   rootPath: join(__dirname, '..','client'),
+    //   // renderPath:'/upload'
+    // }),
+    ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       type: `postgres`,
       host: process.env.POSTGRES_HOST,
@@ -30,7 +37,8 @@ import { UsersModule } from './users/users.module';
       // synchronize: true,
     }),
     AuthModule,
-    UsersModule
+    UsersModule,
+    AboutModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuthDto } from 'src/dto/Auth.dto';
 import { User } from 'src/entity/user.entity';
@@ -6,6 +6,7 @@ import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt'
 import { JwtService } from '@nestjs/jwt';
+import { error } from 'console';
 @Injectable()
 export class AuthService {
     constructor(
@@ -38,7 +39,7 @@ export class AuthService {
         return this.generateToken(payload);
     }
     async register(user: AuthDto): Promise<any> {
-        // try {
+        try {
         // find
         const existUserEmail = await this.userRepository.findOneBy({ email: user.email })
         if (!existUserEmail) {
@@ -70,13 +71,13 @@ export class AuthService {
             error: true,
             message: "Email is used by other user"
         }
-        // } catch (error) {
-        //     //throw new HttpException('Eror request' + error, HttpStatus.BAD_REQUEST)
-        //     return {
-        //         error: true,
-        //         message: error
-        //     }
-        // }
+        } catch (error) {
+            //throw new HttpException('Eror request' + error, HttpStatus.BAD_REQUEST)
+            return {
+                error: true,
+                message: error
+            }
+        }
 
     }
     private async generateToken(payload: { id: number, email: string, role: string }) {
