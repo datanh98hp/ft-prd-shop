@@ -1,10 +1,12 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Put, Req, UploadedFile, UploadedFiles, UseInterceptors } from '@nestjs/common';
-import { FileFieldsInterceptor, FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { Body, Controller, Get, HttpException, HttpStatus, Put, Req, UploadedFile, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
 import { storeConfig } from 'config/store.config';
+import * as fs from 'fs';
+import { AuthGuard } from 'src/auth/auth.guard';
 import { AboutDto } from 'src/dto/AboutDto.dto';
-import { AboutService } from './about.service';
 import { Request } from 'supertest';
-import * as fs from 'fs'
+import { AboutService } from './about.service';
+
 @Controller('about')
 export class AboutController {
     constructor(
@@ -15,6 +17,8 @@ export class AboutController {
     async getAbout() {
         return await this.aboutService.getAbout();
     }
+    @UseGuards(AuthGuard)
+
     @Put()
     async updateAbout(@Body() about: AboutDto) {
         return await this.aboutService.updateAbout(about);

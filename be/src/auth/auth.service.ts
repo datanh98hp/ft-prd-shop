@@ -1,12 +1,10 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as bcrypt from 'bcrypt';
 import { AuthDto } from 'src/dto/Auth.dto';
 import { User } from 'src/entity/user.entity';
-import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
-import * as bcrypt from 'bcrypt'
-import { JwtService } from '@nestjs/jwt';
-import { error } from 'console';
 @Injectable()
 export class AuthService {
     constructor(
@@ -15,7 +13,7 @@ export class AuthService {
     ){}
 
     async signIn(auth:AuthDto){
-        console.log(`login with ${auth}`)
+        console.log(`login with ${JSON.stringify(auth.email)}`);
 
         const user = await this.userRepository.findOneBy({ email: auth.email })
         if (!user) {
@@ -26,6 +24,7 @@ export class AuthService {
             }
         }
         const checkPass = await bcrypt.compareSync(auth.password, user.password);
+
         if (!checkPass) {
             // throw new HttpException('Email or password is wrong', HttpStatus.UNAUTHORIZED)
             return {
@@ -83,7 +82,7 @@ export class AuthService {
     private async generateToken(payload: { id: number, email: string, role: string }) {
         const access_token = await this.jwtService.signAsync(payload, {
             secret: process.env.JWT_SECRET_STRING,
-            expiresIn: '1d'
+            expiresIn: '1h'
         });
         const refresh_token = await this.jwtService.signAsync(payload, {
             secret: process.env.JWT_SECRET_STRING,
