@@ -27,7 +27,8 @@
     display: block;
   }
   .header_menu .menu_sub li {
-    line-height: 45px;
+    line-height: 48px;
+    font-size: 24px;
   }
   .header_menu .menu_sub li:active {
     background-color: #3f444b;
