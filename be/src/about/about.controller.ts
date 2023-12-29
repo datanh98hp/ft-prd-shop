@@ -1,10 +1,14 @@
+
 import { Body, Controller, Get, HttpException, HttpStatus, Put, Req, UploadedFile, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+
 import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
+
 import { storeConfig } from 'config/store.config';
 import * as fs from 'fs';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { AboutDto } from 'src/dto/AboutDto.dto';
 import { Request } from 'supertest';
+
 import { AboutService } from './about.service';
 
 @Controller('about')
@@ -18,7 +22,6 @@ export class AboutController {
         return await this.aboutService.getAbout();
     }
     @UseGuards(AuthGuard)
-
     @Put()
     async updateAbout(@Body() about: AboutDto) {
         return await this.aboutService.updateAbout(about);
@@ -118,7 +121,6 @@ export class AboutController {
         });
 
     }
-
 
 }
 
