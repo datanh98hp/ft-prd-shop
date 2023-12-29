@@ -1,4 +1,6 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Post } from "./post.entity";
 
 @Entity()
 export class User {
@@ -21,11 +23,16 @@ export class User {
     @Column({ nullable: true })
     profileImg: string;
 
+    @OneToMany(type => Post, post => post.user)
+    photos: Post[];
+
     @Column({ type: 'text', nullable: true })
     bio: string
     @CreateDateColumn({ nullable: true })
-    created_at: Date
+    created_at: Date;
     @UpdateDateColumn({ nullable: true })
-    updated_at: Date
+    updated_at: Date;
+
+
 
 }
