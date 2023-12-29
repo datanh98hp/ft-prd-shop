@@ -3,6 +3,7 @@ const nextConfig = {
     images: {
         domains: ['koinclothing.vn'],
     },
+    output:'standalone'
 }
 
 module.exports = nextConfig
