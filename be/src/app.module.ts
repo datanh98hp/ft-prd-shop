@@ -8,6 +8,7 @@ import { UsersModule } from './users/users.module';
 import { AboutModule } from './about/about.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import path, { join } from 'path';
+import { PostModule } from './post/post.module';
 
 
 @Module({
@@ -38,7 +39,8 @@ import path, { join } from 'path';
     }),
     AuthModule,
     UsersModule,
-    AboutModule
+    AboutModule,
+    PostModule
   ],
   controllers: [AppController],
   providers: [AppService],

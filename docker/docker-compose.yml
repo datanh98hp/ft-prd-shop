@@ -1,0 +1,69 @@
+version: '3'
+services:
+  be:
+    container_name: be
+    build:
+      context: ./be
+      dockerfile: ./Dockerfile #path Dockerfile in container
+      target: development
+    command: npm run start:dev
+    env_file:
+      - ./be/.env
+    depends_on:
+      - db
+      - adminer
+    volumes:
+      - ./be:/usr/src/app/
+      - /usr/src/app/node_modules
+    ports:
+      - '8001:8001'
+    networks:
+      - my_network
+  fe:
+    container_name: fe
+    build: 
+      context: ./fe
+      dockerfile: ./dev.Dockerfile #path Dockerfile in container
+    environment:
+      ENV_VARIABLE: ${ENV_VARIABLE}
+      NEXT_PUBLIC_ENV_VARIABLE: ${NEXT_PUBLIC_ENV_VARIABLE}
+    command: npm run dev
+    env_file:
+      - .env
+    depends_on:
+      - be
+    volumes:
+      - ./fe/src/app:/app/src/app
+      - ./fe/public:/app/public
+      # - /fe/tailwind.config.ts
+      # - /fe/postcss.config.js
+    restart: always
+    ports:
+      - '3000:3000'
+    networks:
+      - my_network
+
+  db:
+    image: postgres:latest
+    restart: always
+    ports:
+      - '5432:5432'
+    networks:
+      - my_network
+    volumes:
+      - /var/data/postgres:/data/postgres
+    environment:
+      - POSTGRES_DB=prd
+      - POSTGRES_USER=prd
+      - POSTGRES_PASSWORD=prd06021998
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    networks:
+      - my_network
+
+networks:
+  my_network:
+    external: true
