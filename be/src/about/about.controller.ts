@@ -21,7 +21,7 @@ export class AboutController {
     async getAbout() {
         return await this.aboutService.getAbout();
     }
-    @UseGuards(AuthGuard)
+    // @UseGuards(AuthGuard)
     @Put()
     async updateAbout(@Body() about: AboutDto) {
         return await this.aboutService.updateAbout(about);

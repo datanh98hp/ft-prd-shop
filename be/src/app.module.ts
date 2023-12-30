@@ -1,16 +1,14 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AboutModule } from './about/about.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
-import { AboutModule } from './about/about.module';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import path, { join } from 'path';
 import { PostModule } from './post/post.module';
 
-
+ 
 @Module({
   imports: [
     // ServeStaticModule.forRoot({
@@ -27,6 +25,7 @@ import { PostModule } from './post/post.module';
       database: process.env.POSTGRES_DB,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
+      autoLoadEntities:true
       // 
       // type: 'mysql',
       // host: 'localhost',
@@ -40,7 +39,8 @@ import { PostModule } from './post/post.module';
     AuthModule,
     UsersModule,
     AboutModule,
-    PostModule
+    PostModule,
+
   ],
   controllers: [AppController],
   providers: [AppService],
