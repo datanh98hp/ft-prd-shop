@@ -5,24 +5,22 @@ import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Up
 export class Post {
     @PrimaryGeneratedColumn()
     id: number;
-    @Column({})
+    @Column()
     title: string;
-    @Column({})
+    @Column()
     subtitle: string;
-    @Column({})
+    @Column()
     slug: string;
     @Column({ nullable: true })
     thumb: string;
     @Column({ type: 'text' })
     content: string;
 
-    @ManyToOne(() => User, (user) => user.photos)
-    user: User;
-    
     @CreateDateColumn({ nullable: true })
-    created_at: Date
+    created_at: Date;
     @UpdateDateColumn({ nullable: true })
-    updated_at: Date
-    
+    updated_at: Date;
 
+    @ManyToOne(() => User, (user) => user.posts)
+    author: User;
 }

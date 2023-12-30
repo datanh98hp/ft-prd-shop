@@ -1,4 +1,3 @@
-
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Post } from "./post.entity";
 
@@ -23,9 +22,6 @@ export class User {
     @Column({ nullable: true })
     profileImg: string;
 
-    @OneToMany(type => Post, post => post.user)
-    photos: Post[];
-
     @Column({ type: 'text', nullable: true })
     bio: string
     @CreateDateColumn({ nullable: true })
@@ -33,6 +29,6 @@ export class User {
     @UpdateDateColumn({ nullable: true })
     updated_at: Date;
 
-
-
+    @OneToMany(type => Post, post => post.author)
+    posts: Post[];
 }
