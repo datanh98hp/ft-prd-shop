@@ -9,12 +9,8 @@
         "include": "../upload",
         "outDir": "dist/upload",
         "watchAssets": true
-      },
-      {
-        "include": "../upload",
-        "outDir": "dist/banners",
-        "watchAssets": true
       }
+    
     ],
     "watchAssets": true
   }
