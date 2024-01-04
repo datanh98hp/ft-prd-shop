@@ -1,5 +1,8 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Post } from "./post.entity";
+import { ShopOrder } from "src/shop_order/entities/shop_order.entity";
+import { UserPaymentMethod } from "src/shop_order/entities/user_payment_method.entity";
+import { UserReview } from "src/address/entities/user_review.entity";
 
 @Entity()
 export class User {
@@ -31,4 +34,14 @@ export class User {
 
     @OneToMany(type => Post, post => post.author)
     posts: Post[];
+
+    @OneToMany(type => ShopOrder, order => order.user)
+    orders: ShopOrder[];
+
+    @OneToMany(type => UserPaymentMethod, order => order.user)
+    payment_methods: UserPaymentMethod[];
+
+
+    @OneToMany(type => UserReview, review => review.user)
+    reviews: UserReview[];
 }
