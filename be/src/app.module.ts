@@ -7,6 +7,16 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { PostModule } from './post/post.module';
+import { ProductCategoryModule } from './product_category/product_category.module';
+import { PromotionModule } from './promotion/promotion.module';
+import { PromotionCategoryModule } from './promotion_category/promotion_category.module';
+import { ProductModule } from './product/product.module';
+import { VariationModule } from './variation/variation.module';
+import { VariationOptionModule } from './variation_option/variation_option.module';
+import { ProductItemModule } from './product_item/product_item.module';
+import { ProductConfigurationModule } from './product_configuration/product_configuration.module';
+import { AddressModule } from './address/address.module';
+import { ShopOrderModule } from './shop_order/shop_order.module';
 
  
 @Module({
@@ -40,6 +50,16 @@ import { PostModule } from './post/post.module';
     UsersModule,
     AboutModule,
     PostModule,
+    ProductCategoryModule,
+    PromotionModule,
+    PromotionCategoryModule,
+    ProductModule,
+    VariationModule,
+    VariationOptionModule,
+    ProductItemModule,
+    ProductConfigurationModule,
+    AddressModule,
+    ShopOrderModule,
 
   ],
   controllers: [AppController],
