@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { VariationOptionService } from './variation_option.service';
-import { CreateVariationOptionDto } from './dto/create-variation_option.dto';
-import { UpdateVariationOptionDto } from './dto/update-variation_option.dto';
+import { CreateVariationOptionDto } from '../dto/create-variation_option.dto';
+import { UpdateVariationOptionDto } from '../dto/update-variation_option.dto';
 
 @Controller('variation-option')
 export class VariationOptionController {

@@ -1,6 +1,6 @@
-import { Product } from "src/product/entities/product.entity";
-import { ProductConfiguration } from "src/product_configuration/entities/product_configuration.entity";
-import { OrderLine } from "src/shop_order/entities/order_line.entity";
+import { Product } from "src/entity/product.entity";
+import { ProductConfiguration } from "src/entity/product_configuration.entity";
+import { OrderLine } from "src/entity/order_line.entity";
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()

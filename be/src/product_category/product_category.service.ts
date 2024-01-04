@@ -1,8 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { CreateProductCategoryDto } from './dto/create-product_category.dto';
-import { UpdateProductCategoryDto } from './dto/update-product_category.dto';
+import { CreateProductCategoryDto } from '../dto/create-product_category.dto';
+import { UpdateProductCategoryDto } from '../dto/update-product_category.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ProductCategory } from './entities/product_category.entity';
+import { ProductCategory } from '../entity/product_category.entity';
 import { Like, Repository } from 'typeorm';
 import { PaginateFilter } from 'src/dto/PaginateFilter.dto';
 

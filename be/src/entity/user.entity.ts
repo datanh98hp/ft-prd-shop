@@ -1,7 +1,7 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Post } from "./post.entity";
-import { ShopOrder } from "src/shop_order/entities/shop_order.entity";
-import { UserPaymentMethod } from "src/shop_order/entities/user_payment_method.entity";
+import { ShopOrder } from "src/entity/shop_order.entity";
+import { UserPaymentMethod } from "src/entity/user_payment_method.entity";
 import { UserReview } from "src/address/entities/user_review.entity";
 
 @Entity()

@@ -1,6 +1,6 @@
-import { Product } from "src/product/entities/product.entity";
-import { PromotionCategory } from "src/promotion_category/entities/promotion_category.entity";
-import { Variation } from "src/variation/entities/variation.entity";
+import { Product } from "src/entity/product.entity";
+import { PromotionCategory } from "src/entity/promotion_category.entity";
+import { Variation } from "src/entity/variation.entity";
 import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()

@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { PromotionCategoryService } from './promotion_category.service';
-import { CreatePromotionCategoryDto } from './dto/create-promotion_category.dto';
-import { UpdatePromotionCategoryDto } from './dto/update-promotion_category.dto';
+import { CreatePromotionCategoryDto } from '../dto/create-promotion_category.dto';
+import { UpdatePromotionCategoryDto } from '../dto/update-promotion_category.dto';
 
 @Controller('promotion-category')
 export class PromotionCategoryController {

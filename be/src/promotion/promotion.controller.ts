@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { PromotionService } from './promotion.service';
-import { CreatePromotionDto } from './dto/create-promotion.dto';
-import { UpdatePromotionDto } from './dto/update-promotion.dto';
+import { CreatePromotionDto } from '../dto/create-promotion.dto';
+import { UpdatePromotionDto } from '../dto/update-promotion.dto';
 import { query } from 'express';
 import { PaginateFilter } from 'src/dto/PaginateFilter.dto';
 

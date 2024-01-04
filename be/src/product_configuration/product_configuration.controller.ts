@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { ProductConfigurationService } from './product_configuration.service';
-import { CreateProductConfigurationDto } from './dto/create-product_configuration.dto';
-import { UpdateProductConfigurationDto } from './dto/update-product_configuration.dto';
+import { CreateProductConfigurationDto } from '../dto/create-product_configuration.dto';
+import { UpdateProductConfigurationDto } from '../dto/update-product_configuration.dto';
 
 @Controller('product-configuration')
 export class ProductConfigurationController {

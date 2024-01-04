@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { CreateVariationOptionDto } from './dto/create-variation_option.dto';
-import { UpdateVariationOptionDto } from './dto/update-variation_option.dto';
+import { CreateVariationOptionDto } from '../dto/create-variation_option.dto';
+import { UpdateVariationOptionDto } from '../dto/update-variation_option.dto';
 
 @Injectable()
 export class VariationOptionService {

@@ -1,5 +1,5 @@
-import { ProductCategory } from "src/product_category/entities/product_category.entity";
-import { ProductItem } from "src/product_item/entities/product_item.entity";
+import { ProductCategory } from "src/entity/product_category.entity";
+import { ProductItem } from "src/entity/product_item.entity";
 import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
