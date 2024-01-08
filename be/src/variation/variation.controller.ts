@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { VariationService } from './variation.service';
-import { CreateVariationDto } from './dto/create-variation.dto';
-import { UpdateVariationDto } from './dto/update-variation.dto';
+import { CreateVariationDto } from '../dto/create-variation.dto';
+import { UpdateVariationDto } from '../dto/update-variation.dto';
 
 @Controller('variation')
 export class VariationController {

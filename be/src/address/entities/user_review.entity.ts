@@ -1,5 +1,5 @@
 import { User } from "src/entity/user.entity";
-import { ShopOrder } from "src/shop_order/entities/shop_order.entity";
+import { ShopOrder } from "src/entity/shop_order.entity";
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()

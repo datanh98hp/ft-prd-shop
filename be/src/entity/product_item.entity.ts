@@ -1,7 +1,8 @@
-import { Product } from "src/product/entities/product.entity";
-import { ProductConfiguration } from "src/product_configuration/entities/product_configuration.entity";
-import { OrderLine } from "src/shop_order/entities/order_line.entity";
+import { Product } from "src/entity/product.entity";
+import { ProductConfiguration } from "src/entity/product_configuration.entity";
+import { OrderLine } from "src/entity/order_line.entity";
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { ShoppingCartItem } from "./shop_cart_item.entity";
 
 @Entity()
 export class ProductItem {
@@ -23,6 +24,9 @@ export class ProductItem {
 
     @OneToMany(() => OrderLine, (lines) => lines.product_item)
     order_lines: OrderLine[];
+
+    @OneToMany(() => ShoppingCartItem, (item) => item.cart)
+    items: ShoppingCartItem[]
 
     
 }

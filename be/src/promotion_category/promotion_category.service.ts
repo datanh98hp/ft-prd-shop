@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { CreatePromotionCategoryDto } from './dto/create-promotion_category.dto';
-import { UpdatePromotionCategoryDto } from './dto/update-promotion_category.dto';
+import { CreatePromotionCategoryDto } from '../dto/create-promotion_category.dto';
+import { UpdatePromotionCategoryDto } from '../dto/update-promotion_category.dto';
 
 @Injectable()
 export class PromotionCategoryService {

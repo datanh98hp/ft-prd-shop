@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { VariationOptionService } from './variation_option.service';
 import { VariationOptionController } from './variation_option.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { VariationOption } from './entities/variation_option.entity';
+import { VariationOption } from '../entity/variation_option.entity';
 
 @Module({
   imports:[

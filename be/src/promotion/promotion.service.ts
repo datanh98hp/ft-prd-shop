@@ -1,8 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { CreatePromotionDto } from './dto/create-promotion.dto';
-import { UpdatePromotionDto } from './dto/update-promotion.dto';
+import { CreatePromotionDto } from '../dto/create-promotion.dto';
+import { UpdatePromotionDto } from '../dto/update-promotion.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Promotion } from './entities/promotion.entity';
+import { Promotion } from '../entity/promotion.entity';
 import { Like, Repository } from 'typeorm';
 import { PaginateFilter } from 'src/dto/PaginateFilter.dto';
 

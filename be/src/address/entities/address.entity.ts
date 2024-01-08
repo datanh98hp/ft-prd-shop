@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Country } from "./country.entity";
-import { ShopOrder } from "src/shop_order/entities/shop_order.entity";
+import { ShopOrder } from "src/entity/shop_order.entity";
 
 @Entity()
 export class Address {

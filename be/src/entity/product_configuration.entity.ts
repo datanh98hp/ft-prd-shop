@@ -1,5 +1,5 @@
-import { ProductItem } from "src/product_item/entities/product_item.entity";
-import { VariationOption } from "src/variation_option/entities/variation_option.entity";
+import { ProductItem } from "src/entity/product_item.entity";
+import { VariationOption } from "src/entity/variation_option.entity";
 import { Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()

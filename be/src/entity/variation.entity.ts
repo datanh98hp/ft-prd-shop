@@ -1,5 +1,5 @@
-import { ProductCategory } from "src/product_category/entities/product_category.entity";
-import { VariationOption } from "src/variation_option/entities/variation_option.entity";
+import { ProductCategory } from "src/entity/product_category.entity";
+import { VariationOption } from "src/entity/variation_option.entity";
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()

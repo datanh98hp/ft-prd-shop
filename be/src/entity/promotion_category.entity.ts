@@ -1,5 +1,5 @@
-import { ProductCategory } from "src/product_category/entities/product_category.entity";
-import { Promotion } from "src/promotion/entities/promotion.entity";
+import { ProductCategory } from "src/entity/product_category.entity";
+import { Promotion } from "src/entity/promotion.entity";
 import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm"
 
 @Entity()

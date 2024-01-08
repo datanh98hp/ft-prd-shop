@@ -1,4 +1,4 @@
-import { PromotionCategory } from "src/promotion_category/entities/promotion_category.entity";
+import { PromotionCategory } from "src/entity/promotion_category.entity";
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
