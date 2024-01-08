@@ -44,4 +44,6 @@ export class User {
 
     @OneToMany(type => UserReview, review => review.user)
     reviews: UserReview[];
+
+    
 }
