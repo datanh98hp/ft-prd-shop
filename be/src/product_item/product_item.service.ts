@@ -1,26 +1,159 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateProductItemDto } from '../dto/create-product_item.dto';
 import { UpdateProductItemDto } from '../dto/update-product_item.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ProductItem } from 'src/entity/product_item.entity';
+import { LessThanOrEqual, Like, MoreThan, MoreThanOrEqual, Repository } from 'typeorm';
+import { ProductItemFilterPaginateDto } from 'src/dto/ProductItemFilterPaginate.dto';
 
 @Injectable()
 export class ProductItemService {
-  create(createProductItemDto: CreateProductItemDto) {
-    return 'This action adds a new productItem';
+  constructor(
+    @InjectRepository(ProductItem) private readonly productItemRepo: Repository<ProductItem>,
+  ) { }
+
+  async create(createProductItemDto: CreateProductItemDto) {
+    const newItmPrd = this.productItemRepo.create(createProductItemDto);
+    const itemNew = await this.productItemRepo.save(newItmPrd);
+    if (!itemNew) {
+      throw new HttpException('error', HttpStatus.BAD_REQUEST);
+    }
+    throw new HttpException('success', HttpStatus.CREATED);
   }
 
-  findAll() {
-    return `This action returns all productItem`;
+  async findAll(query: ProductItemFilterPaginateDto) {
+   
+    const items_per_page = Number(query.items_per_page) || 10;
+    const page = Number(query.page) || 1;
+
+    const skip = (page - 1) * items_per_page;
+
+    const sortBy = query.sortBy; //'DESC' || "ASC"
+
+    const sku = query.sku;
+    /// filter by
+    const qty_in_stock = Number(query.qty_in_stock) || 0;
+    const startPrice = Number(query.startPrice) || 0;
+    const endPrice = Number(query.endPrice) || 0;
+    const product_id = Number(query.product_id) || null;
+    // search
+
+    const keyword = query.keyword;
+
+    const [res, total] = await this.productItemRepo.findAndCount({
+      order: {
+        created_at: sortBy ? 'ASC' : "DESC"
+      },
+      transaction: true,
+      where: [
+        { sku: Like(`%${sku}%`) },
+      ],
+      cache: true,
+      take: items_per_page,
+      skip: skip,
+      relations:
+      {
+        cart_items: true,
+        product: true
+      }
+
+    });
+    const lastPage = Math.ceil(total / items_per_page);
+
+    const nextPage = page + 1 ? null : page + 1;
+
+    const previousPage = page - 1 < 1 ? null : page - 1;
+    return {
+      data: res,
+      total,
+      currentPage: page,
+      nextPage,
+      previousPage,
+      lastPage,
+    };
+
+  }
+  async filter(query: ProductItemFilterPaginateDto) {
+    console.log(query);
+    const items_per_page = Number(query.items_per_page) || 10;
+    const page = Number(query.page) || 1;
+
+    const skip = (page - 1) * items_per_page;
+
+    const sortBy = query.sortBy; //'DESC' || "ASC"
+
+    const sku = query.sku;
+    /// filter by
+    const qty_in_stock = Number(query.qty_in_stock) || 0;
+    const startPrice = Number(query.startPrice) || 0;
+    const endPrice = Number(query.endPrice) || 0;
+    const product_id = Number(query.product_id) || null;
+    // search
+
+    const keyword = query.keyword;
+
+    const [res, total] = await this.productItemRepo.findAndCount({
+      order: {
+        // created_at: sortBy ? 'ASC' : "DESC",
+        price: sortBy ? 'ASC' : "DESC",
+      },
+      transaction: true,
+      where: {
+        product: { id: product_id },
+        price: MoreThanOrEqual(startPrice),
+      },
+      cache: true,
+      take: items_per_page,
+      skip: skip,
+      relations:
+      {
+        cart_items: true,
+        product: true
+      }
+
+    });
+    const lastPage = Math.ceil(total / items_per_page);
+
+    const nextPage = page + 1 ? null : page + 1;
+
+    const previousPage = page - 1 < 1 ? null : page - 1;
+    return {
+      data: res,
+      total,
+      currentPage: page,
+      nextPage,
+      previousPage,
+      lastPage,
+    };
+  }
+  async findOne(id: number) {
+    try {
+      return await this.productItemRepo.findOne({
+        where: { id },
+        relations:
+        {
+          cart_items: true,
+          order_lines: true
+        }
+      });
+    } catch (error) {
+      throw new HttpException('Not found item', HttpStatus.NOT_FOUND);
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} productItem`;
+  async update(id: number, updateProductItemDto: UpdateProductItemDto) {
+    try {
+      return await this.productItemRepo.update({ id }, updateProductItemDto);
+    } catch (error) {
+      throw new HttpException('Not found item to update', HttpStatus.NOT_FOUND);
+    }
   }
 
-  update(id: number, updateProductItemDto: UpdateProductItemDto) {
-    return `This action updates a #${id} productItem`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} productItem`;
+  async remove(id: number) {
+    try {
+      return await this.productItemRepo.delete(id);
+    } catch (error) {
+      throw new HttpException('Can not delete this product, that product have items', HttpStatus.NOT_FOUND);
+    }
   }
 }
