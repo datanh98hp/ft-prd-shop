@@ -5,11 +5,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Promotion } from '../entity/promotion.entity';
 import { Like, Repository } from 'typeorm';
 import { PaginateFilter } from 'src/dto/PaginateFilter.dto';
+import { PromotionCategory } from 'src/entity/promotion_category.entity';
 
 @Injectable()
 export class PromotionService {
   constructor(
-    @InjectRepository(Promotion) private readonly promoteRepo: Repository<Promotion>
+    @InjectRepository(Promotion) private readonly promoteRepo: Repository<Promotion>,
+    @InjectRepository(PromotionCategory) private readonly cateRepo: Repository<PromotionCategory>
   ) { }
   async create(createPromotionDto: CreatePromotionDto): Promise<Promotion> {
     const newPromo = this.promoteRepo.create(createPromotionDto);
@@ -103,4 +105,11 @@ export class PromotionService {
   async remove(id: number): Promise<any> {
     return await this.promoteRepo.delete(id);
   }
+  // promotion_cate
+
+  async list_promotion_cates(query: {id,promotion_id,sortBy}){
+    return await this.cateRepo.findBy({});
+  }
+
+  
 }

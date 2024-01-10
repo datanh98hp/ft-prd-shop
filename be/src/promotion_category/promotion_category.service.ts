@@ -1,26 +1,43 @@
+import { query } from 'express';
 import { Injectable } from '@nestjs/common';
 import { CreatePromotionCategoryDto } from '../dto/create-promotion_category.dto';
 import { UpdatePromotionCategoryDto } from '../dto/update-promotion_category.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { PromotionCategory } from 'src/entity/promotion_category.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class PromotionCategoryService {
-  create(createPromotionCategoryDto: CreatePromotionCategoryDto) {
-    return 'This action adds a new promotionCategory';
+
+  constructor(
+    @InjectRepository(PromotionCategory) private readonly promotionCateRepo: Repository<PromotionCategory>
+  ) { }
+
+
+  async create(createPromotionCategoryDto: CreatePromotionCategoryDto) {
+    const newCate = await this.promotionCateRepo.create(createPromotionCategoryDto);
+    return await this.promotionCateRepo.save(newCate);
   }
 
-  findAll() {
-    return `This action returns all promotionCategory`;
+  async findAll(query: { sortBy, promotionId, categoriesId }) {
+
+    return await this.promotionCateRepo.find({
+      order: {
+        id: query.sortBy ? 'DESC' : "ASC"
+      },
+      relations: ['promotion', 'category']
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} promotionCategory`;
+  async findOne(id: number) {
+    return await this.promotionCateRepo.findOneBy({id});
   }
 
-  update(id: number, updatePromotionCategoryDto: UpdatePromotionCategoryDto) {
-    return `This action updates a #${id} promotionCategory`;
+  async update(id: number, updatePromotionCategoryDto: UpdatePromotionCategoryDto) {
+    return await this.promotionCateRepo.update(id,updatePromotionCategoryDto) ;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} promotionCategory`;
+  async remove(id: number) {
+    return await this.promotionCateRepo.delete(id);
   }
 }

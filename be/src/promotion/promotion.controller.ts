@@ -7,7 +7,9 @@ import { PaginateFilter } from 'src/dto/PaginateFilter.dto';
 
 @Controller('promotion')
 export class PromotionController {
-  constructor(private readonly promotionService: PromotionService) {}
+  constructor(
+    private readonly promotionService: PromotionService
+    ) {}
 
   @Post()
   create(@Body() createPromotionDto: CreatePromotionDto) {
@@ -33,4 +35,11 @@ export class PromotionController {
   remove(@Param('id') id: string) {
     return this.promotionService.remove(+id);
   }
+  // promotion_category
+
+  @Get('promotion-category')
+  async listCate(@Query() query: { id, promotion_id,sortBy} ):Promise<any>{
+    return await this.listCate(query);
+  }
+
 }

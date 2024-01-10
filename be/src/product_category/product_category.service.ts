@@ -44,6 +44,8 @@ export class ProductCategoryService {
       relations:
       {
         parent_category: true,
+        prducts:true,
+        variations:true
       }
       ,
       select: {

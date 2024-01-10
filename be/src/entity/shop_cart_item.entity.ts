@@ -10,7 +10,7 @@ export class ShoppingCartItem {
     @ManyToOne(() => ShoppingCart, (cart) => cart.items)
     cart: ShoppingCart;
 
-    @ManyToOne(() => ProductItem, (product) => product.items)
+    @ManyToOne(() => ProductItem, (product) => product.cart_items)
     product_item: ProductItem;
 
     @Column({type:'integer'})

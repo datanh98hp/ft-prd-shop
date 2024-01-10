@@ -8,8 +8,8 @@ export class PromotionCategory {
     id: number;
 
     @ManyToOne(() => ProductCategory, (it) => it.parent_category)
-    categories: number;
+    category: ProductCategory;
     
-    @ManyToOne(() => Promotion, (user) => user.promotions)
-    promotion: number;
+    @ManyToOne(() => Promotion, (pr) => pr.promotions)
+    promotion: Promotion;
 }

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { PromotionCategoryService } from './promotion_category.service';
 import { CreatePromotionCategoryDto } from '../dto/create-promotion_category.dto';
 import { UpdatePromotionCategoryDto } from '../dto/update-promotion_category.dto';
@@ -13,8 +13,8 @@ export class PromotionCategoryController {
   }
 
   @Get()
-  findAll() {
-    return this.promotionCategoryService.findAll();
+  async findAll(@Query() query: { sortBy, promotionId, categoriesId }) {
+    return this.promotionCategoryService.findAll(query);
   }
 
   @Get(':id')
