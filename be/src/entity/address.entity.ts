@@ -25,5 +25,6 @@ export class Address {
 
 
     @OneToMany(type => ShopOrder, order => order.shipping_address)
-    payment_methods: ShopOrder[];
+    orders: ShopOrder[];
+
 }

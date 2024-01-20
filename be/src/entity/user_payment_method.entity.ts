@@ -8,8 +8,8 @@ export class UserPaymentMethod {
     @PrimaryGeneratedColumn()
     id: number;
     @Column()
-    name: string;
-    @Column()
+    // name: string;
+    // @Column()
     price: string;
 
     @ManyToOne(() => User, (user) => user.payment_methods)

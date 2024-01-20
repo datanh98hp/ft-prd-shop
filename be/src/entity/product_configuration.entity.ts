@@ -8,9 +8,8 @@ export class ProductConfiguration {
     id: number;
 
     @ManyToOne(() => ProductItem, (prdItem) => prdItem.product_configurations)
-    product_item: VariationOption;
+    product_item: ProductItem;
 
     @ManyToOne(() => VariationOption, (opt) => opt.product_configurations)
     variation_option: VariationOption;
-
 }

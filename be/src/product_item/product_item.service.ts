@@ -1,3 +1,5 @@
+import { UpdateProductConfigurationDto } from './../dto/update-product_configuration.dto';
+
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateProductItemDto } from '../dto/create-product_item.dto';
 import { UpdateProductItemDto } from '../dto/update-product_item.dto';
@@ -5,11 +7,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ProductItem } from 'src/entity/product_item.entity';
 import { LessThanOrEqual, Like, MoreThan, MoreThanOrEqual, Repository } from 'typeorm';
 import { ProductItemFilterPaginateDto } from 'src/dto/ProductItemFilterPaginate.dto';
+import { ProductConfiguration } from 'src/entity/product_configuration.entity';
+import { CreateProductConfigurationDto } from 'src/dto/create-product_configuration.dto';
 
 @Injectable()
 export class ProductItemService {
   constructor(
     @InjectRepository(ProductItem) private readonly productItemRepo: Repository<ProductItem>,
+    @InjectRepository(ProductConfiguration) private readonly productConfigRepo: Repository<ProductConfiguration>,
   ) { }
 
   async create(createProductItemDto: CreateProductItemDto) {
@@ -22,7 +27,7 @@ export class ProductItemService {
   }
 
   async findAll(query: ProductItemFilterPaginateDto) {
-   
+
     const items_per_page = Number(query.items_per_page) || 10;
     const page = Number(query.page) || 1;
 
@@ -54,7 +59,8 @@ export class ProductItemService {
       relations:
       {
         cart_items: true,
-        product: true
+        product: true,
+        product_configurations: true
       }
 
     });
@@ -108,7 +114,8 @@ export class ProductItemService {
       relations:
       {
         cart_items: true,
-        product: true
+        product: true,
+        product_configurations: true
       }
 
     });
@@ -133,7 +140,10 @@ export class ProductItemService {
         relations:
         {
           cart_items: true,
-          order_lines: true
+          order_lines: true,
+          product_configurations: {
+            variation_option: true
+          }
         }
       });
     } catch (error) {
@@ -156,4 +166,28 @@ export class ProductItemService {
       throw new HttpException('Can not delete this product, that product have items', HttpStatus.NOT_FOUND);
     }
   }
+
+  // product_configuration
+  async listVariationOptions() {
+    return await this.productConfigRepo.find({
+      relations: {
+        product_item:true,
+        variation_option:true
+      }
+    });
+  }
+  async createVariationOption(createProductOpt: CreateProductConfigurationDto) {
+    console.log(createProductOpt)
+    const newOpt = this.productConfigRepo.create(createProductOpt);
+    return await this.productConfigRepo.save(newOpt);
+  }
+
+  async updateVariationOption(id: number, updateProductOpt: UpdateProductConfigurationDto) {
+    return await this.productConfigRepo.update(id, updateProductOpt);
+  }
+
+  async deleteVariationOption(id: number) {
+    return await this.productConfigRepo.delete(id);
+  }
+
 }
