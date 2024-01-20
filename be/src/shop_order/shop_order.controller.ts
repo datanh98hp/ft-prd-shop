@@ -1,17 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { ShopOrderService } from './shop_order.service';
-import { CreateShopOrderDto } from '../dto/create-shop_order.dto';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { CreateOrderDto } from 'src/dto/Create-Order.dto';
 import { UpdateShopOrderDto } from '../dto/update-shop_order.dto';
+import { ShopOrderService } from './shop_order.service';
 
 @Controller('shop-order')
 export class ShopOrderController {
-  constructor(private readonly shopOrderService: ShopOrderService) {}
+  constructor(
+    private readonly shopOrderService: ShopOrderService,
+    ) { }
 
   @Post()
-  create(@Body() createShopOrderDto: CreateShopOrderDto) {
-    return this.shopOrderService.create(createShopOrderDto);
+  async createOrder(@Body() createOrderDto: CreateOrderDto) {
+    return await this.shopOrderService.createOrder(createOrderDto)
   }
-
   @Get()
   findAll() {
     return this.shopOrderService.findAll();

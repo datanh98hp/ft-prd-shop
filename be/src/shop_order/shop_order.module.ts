@@ -8,10 +8,11 @@ import { UserPaymentMethod } from '../entity/user_payment_method.entity';
 import { ShippingMethod } from '../entity/shipping_method.entity';
 import { OrderLine } from '../entity/order_line.entity';
 import { PaymentType } from '../entity/payment_type.entity';
+import { ProductItem } from 'src/entity/product_item.entity';
 
 @Module({
   imports:[
-    TypeOrmModule.forFeature([ShopOrder,OrderStatus,UserPaymentMethod,ShippingMethod,OrderLine,PaymentType])
+    TypeOrmModule.forFeature([ShopOrder, OrderStatus, UserPaymentMethod, ShippingMethod, OrderLine, PaymentType, ProductItem])
   ],
   controllers: [ShopOrderController],
   providers: [ShopOrderService],
