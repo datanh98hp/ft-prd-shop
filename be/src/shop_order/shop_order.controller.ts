@@ -1,7 +1,9 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { CreateOrderDto } from 'src/dto/Create-Order.dto';
 import { UpdateShopOrderDto } from '../dto/update-shop_order.dto';
 import { ShopOrderService } from './shop_order.service';
+import { query } from 'express';
+import { OrderQueryFilterPaginate } from 'src/dto/OrderQueryFilterPaginate.dto';
 
 @Controller('shop-order')
 export class ShopOrderController {
@@ -11,11 +13,12 @@ export class ShopOrderController {
 
   @Post()
   async createOrder(@Body() createOrderDto: CreateOrderDto) {
+    
     return await this.shopOrderService.createOrder(createOrderDto)
   }
   @Get()
-  findAll() {
-    return this.shopOrderService.findAll();
+  findAll(@Query() query: OrderQueryFilterPaginate) {
+    return this.shopOrderService.findAll(query);
   }
 
   @Get(':id')
@@ -24,8 +27,8 @@ export class ShopOrderController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateShopOrderDto: UpdateShopOrderDto) {
-    return this.shopOrderService.update(+id, updateShopOrderDto);
+  async update(@Param('id') id: string, @Body() updateShopOrderDto: UpdateShopOrderDto) {
+    return await this.shopOrderService.update(+id, updateShopOrderDto);
   }
 
   @Delete(':id')

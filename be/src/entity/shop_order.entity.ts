@@ -34,7 +34,7 @@ export class ShopOrder {
     @OneToMany(() => UserReview, (review) => review.revirew_order,{nullable:true})
     review: UserReview[];
 
-    @Column()
+    @Column({default:0})
     order_total: number;
 
     @ManyToOne(() => OrderStatus, (stt) => stt.orders)

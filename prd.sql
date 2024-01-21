@@ -1,5 +1,7 @@
 -- Adminer 4.8.1 PostgreSQL 16.1 (Debian 16.1-1.pgdg120+1) dump
 
+\connect "prd";
+
 DROP TABLE IF EXISTS "about";
 DROP SEQUENCE IF EXISTS about_id_seq;
 CREATE SEQUENCE about_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
@@ -42,6 +44,8 @@ CREATE TABLE "public"."address" (
 ) WITH (oids = false);
 
 TRUNCATE "address";
+INSERT INTO "address" ("id", "unit_number", "stress_number", "address_line_1", "address_line_2", "city", "postal_code", "countryId") VALUES
+(1,	'vnd',	'',	'Quoc Tuan - An Lao - Hai Phong',	NULL,	'Hai Phong',	'180000',	1);
 
 DROP TABLE IF EXISTS "country";
 DROP SEQUENCE IF EXISTS country_id_seq;
@@ -55,6 +59,8 @@ CREATE TABLE "public"."country" (
 ) WITH (oids = false);
 
 TRUNCATE "country";
+INSERT INTO "country" ("id", "code", "country_name") VALUES
+(1,	'1',	'Vietnam');
 
 DROP TABLE IF EXISTS "order_line";
 DROP SEQUENCE IF EXISTS order_line_id_seq;
@@ -70,6 +76,9 @@ CREATE TABLE "public"."order_line" (
 ) WITH (oids = false);
 
 TRUNCATE "order_line";
+INSERT INTO "order_line" ("id", "qty", "price", "productItemId", "orderId") VALUES
+(15,	2,	500,	1,	30),
+(16,	5,	201,	2,	30);
 
 DROP TABLE IF EXISTS "order_status";
 DROP SEQUENCE IF EXISTS order_status_id_seq;
@@ -78,11 +87,14 @@ CREATE SEQUENCE order_status_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 C
 CREATE TABLE "public"."order_status" (
     "id" integer DEFAULT nextval('order_status_id_seq') NOT NULL,
     "name" character varying NOT NULL,
-    "price" character varying NOT NULL,
     CONSTRAINT "PK_8ea75b2a26f83f3bc98b9c6aaf6" PRIMARY KEY ("id")
 ) WITH (oids = false);
 
 TRUNCATE "order_status";
+INSERT INTO "order_status" ("id", "name") VALUES
+(1,	'Cancel'),
+(2,	'delivery'),
+(3,	'success');
 
 DROP TABLE IF EXISTS "payment_type";
 DROP SEQUENCE IF EXISTS payment_type_id_seq;
@@ -95,6 +107,10 @@ CREATE TABLE "public"."payment_type" (
 ) WITH (oids = false);
 
 TRUNCATE "payment_type";
+INSERT INTO "payment_type" ("id", "type") VALUES
+(1,	'CK'),
+(2,	'online'),
+(3,	'COD');
 
 DROP TABLE IF EXISTS "post";
 DROP SEQUENCE IF EXISTS post_id_seq;
@@ -153,7 +169,10 @@ CREATE TABLE "public"."product_category" (
 TRUNCATE "product_category";
 INSERT INTO "product_category" ("id", "parentCategoryId", "category_name", "promotionsId") VALUES
 (1,	NULL,	'category test',	1),
-(2,	NULL,	'test2',	NULL);
+(2,	NULL,	'test2',	NULL),
+(3,	NULL,	'T-shirt',	NULL),
+(4,	NULL,	'Sơ mi',	NULL),
+(5,	NULL,	'blader',	NULL);
 
 DROP TABLE IF EXISTS "product_configuration";
 DROP SEQUENCE IF EXISTS product_configuration_id_seq;
@@ -167,6 +186,9 @@ CREATE TABLE "public"."product_configuration" (
 ) WITH (oids = false);
 
 TRUNCATE "product_configuration";
+INSERT INTO "product_configuration" ("id", "productItemId", "variationOptionId") VALUES
+(3,	1,	1),
+(7,	1,	1);
 
 DROP TABLE IF EXISTS "product_item";
 DROP SEQUENCE IF EXISTS product_item_id_seq;
@@ -240,6 +262,9 @@ CREATE TABLE "public"."shipping_method" (
 ) WITH (oids = false);
 
 TRUNCATE "shipping_method";
+INSERT INTO "shipping_method" ("id", "name", "price") VALUES
+(1,	'COD',	'4000'),
+(2,	'Fast ship',	'50000');
 
 DROP TABLE IF EXISTS "shop_order";
 DROP SEQUENCE IF EXISTS shop_order_id_seq;
@@ -247,17 +272,27 @@ CREATE SEQUENCE shop_order_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CAC
 
 CREATE TABLE "public"."shop_order" (
     "id" integer DEFAULT nextval('shop_order_id_seq') NOT NULL,
-    "order_date" time without time zone NOT NULL,
     "order_total" integer NOT NULL,
-    "order_status" integer NOT NULL,
+    "orderStatusId" integer,
     "userId" integer,
     "paymentMethodId" integer,
     "shippingAddressId" integer,
     "shippingMethodId" integer,
+    "order_date" timestamp DEFAULT now(),
     CONSTRAINT "PK_aff7956a99be3a90c1075744b6a" PRIMARY KEY ("id")
 ) WITH (oids = false);
 
 TRUNCATE "shop_order";
+INSERT INTO "shop_order" ("id", "order_total", "orderStatusId", "userId", "paymentMethodId", "shippingAddressId", "shippingMethodId", "order_date") VALUES
+(22,	10442,	1,	1,	1,	1,	2,	'2024-01-20 17:24:42.185627'),
+(23,	10442,	1,	1,	1,	1,	2,	'2024-01-20 17:45:10.709042'),
+(24,	10442,	1,	1,	1,	1,	2,	'2024-01-20 17:47:10.271568'),
+(25,	10442,	1,	1,	1,	1,	2,	'2024-01-20 17:48:57.564231'),
+(26,	10442,	1,	1,	1,	1,	2,	'2024-01-20 18:17:12.395274'),
+(27,	10442,	1,	1,	1,	1,	2,	'2024-01-20 18:17:57.409429'),
+(28,	10442,	1,	1,	1,	1,	2,	'2024-01-20 18:20:33.53293'),
+(29,	10442,	1,	1,	1,	1,	2,	'2024-01-20 18:24:51.289033'),
+(30,	10442,	1,	1,	1,	1,	2,	'2024-01-20 18:31:11.83308');
 
 DROP TABLE IF EXISTS "shopping_cart";
 DROP SEQUENCE IF EXISTS shopping_cart_id_seq;
@@ -331,7 +366,6 @@ CREATE SEQUENCE user_payment_method_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 21474
 
 CREATE TABLE "public"."user_payment_method" (
     "id" integer DEFAULT nextval('user_payment_method_id_seq') NOT NULL,
-    "name" character varying NOT NULL,
     "price" character varying NOT NULL,
     "provider" character varying NOT NULL,
     "account_number" character varying NOT NULL,
@@ -343,6 +377,8 @@ CREATE TABLE "public"."user_payment_method" (
 ) WITH (oids = false);
 
 TRUNCATE "user_payment_method";
+INSERT INTO "user_payment_method" ("id", "price", "provider", "account_number", "expiry_date", "is_default", "userId", "paymentTypeId") VALUES
+(1,	'10',	'GJFD',	'0869029018',	'18/30',	't',	1,	1);
 
 DROP TABLE IF EXISTS "user_review";
 DROP SEQUENCE IF EXISTS user_review_id_seq;
@@ -375,7 +411,10 @@ CREATE TABLE "public"."variation" (
 TRUNCATE "variation";
 INSERT INTO "variation" ("id", "category_name", "categoryId") VALUES
 (1,	't',	1),
-(2,	'Test api',	1);
+(2,	'Test api',	1),
+(3,	'color',	3),
+(4,	'size',	3),
+(5,	'type',	3);
 
 DROP TABLE IF EXISTS "variation_option";
 DROP SEQUENCE IF EXISTS variation_option_id_seq;
@@ -412,6 +451,7 @@ ALTER TABLE ONLY "public"."product_item" ADD CONSTRAINT "FK_5be351f01d190ba6c78a
 ALTER TABLE ONLY "public"."promotion_category" ADD CONSTRAINT "FK_090a7d7e58ff24a7955017bbc63" FOREIGN KEY ("promotionId") REFERENCES promotion(id) NOT DEFERRABLE;
 ALTER TABLE ONLY "public"."promotion_category" ADD CONSTRAINT "FK_5206df6d768890df720c1ddc41a" FOREIGN KEY ("categoryId") REFERENCES product_category(id) NOT DEFERRABLE;
 
+ALTER TABLE ONLY "public"."shop_order" ADD CONSTRAINT "FK_26859f3f6194dcc6b67d88de2a5" FOREIGN KEY ("orderStatusId") REFERENCES order_status(id) NOT DEFERRABLE;
 ALTER TABLE ONLY "public"."shop_order" ADD CONSTRAINT "FK_3ef088492bf99e3c249d64540fe" FOREIGN KEY ("paymentMethodId") REFERENCES user_payment_method(id) NOT DEFERRABLE;
 ALTER TABLE ONLY "public"."shop_order" ADD CONSTRAINT "FK_84578b83091c56783495bb94e4b" FOREIGN KEY ("shippingAddressId") REFERENCES address(id) NOT DEFERRABLE;
 ALTER TABLE ONLY "public"."shop_order" ADD CONSTRAINT "FK_a76aacd2fbf9e6f6330fd20be32" FOREIGN KEY ("userId") REFERENCES "user"(id) NOT DEFERRABLE;
@@ -435,4 +475,4 @@ ALTER TABLE ONLY "public"."variation" ADD CONSTRAINT "FK_07cfd3fe4515c0fc98236ae
 
 ALTER TABLE ONLY "public"."variation_option" ADD CONSTRAINT "FK_a06cf50cd60fc0e723ef8f7e84f" FOREIGN KEY ("variationId") REFERENCES variation(id) NOT DEFERRABLE;
 
--- 2024-01-10 14:29:17.258749+00
+-- 2024-01-20 18:48:21.701505+00
