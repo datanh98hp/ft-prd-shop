@@ -14,5 +14,5 @@ export class CreateOrderDto {
     shippingMethod: ShippingMethod;
     order_total: number;
     order_status: OrderStatus;
-    order_lines : OrderLine[];
+    order_lines?: OrderLine[];
 }

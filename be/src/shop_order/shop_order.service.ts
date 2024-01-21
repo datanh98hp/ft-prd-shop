@@ -27,8 +27,6 @@ export class ShopOrderService {
   ) { }
 
   async createOrder(createOrderDto: CreateOrderDto) { //CreateOrderDto
-
-
     //console.log(createOrderDto);
     const orderInst = await this.shopOrderRepo.create(createOrderDto);
     const orderNew = await this.shopOrderRepo.save(orderInst);
@@ -161,10 +159,14 @@ export class ShopOrderService {
   async update(id: number, updateShopOrderDto: UpdateShopOrderDto) {
     // re-estimate order_total before update order item
     try {
-      console.log(updateShopOrderDto,id);
-      return await this.shopOrderRepo.update({id}, updateShopOrderDto);
-    } catch (error) {
-      return new HttpException('Can not update this item', HttpStatus.BAD_REQUEST);
+      const item = await this.findOne(id);
+      if (!item) {
+        return new HttpException('Can not find this item.', HttpStatus.NOT_FOUND);
+      }
+     // console.log(updateShopOrderDto,id);
+      return await this.shopOrderRepo.update(id, updateShopOrderDto);
+    } catch (error:any) {
+      return new HttpException('Can not update this item .' + error.message, HttpStatus.BAD_REQUEST);
     }
 
   }

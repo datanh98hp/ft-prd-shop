@@ -23,11 +23,13 @@ export class ShopOrderController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
+   
     return this.shopOrderService.findOne(+id);
   }
 
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateShopOrderDto: UpdateShopOrderDto) {
+    //console.log(updateShopOrderDto)
     return await this.shopOrderService.update(+id, updateShopOrderDto);
   }
 
