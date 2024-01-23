@@ -1,16 +1,19 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from 'src/dto/CreateUser.dto';
 import { PaginateFilter } from 'src/dto/PaginateFilter.dto';
 import { UpdateUserDto } from 'src/dto/UpdateUser.dto';
+import { CreateUserPaymentMethodDto } from 'src/dto/create-user-payment-method.dto';
 import { User } from 'src/entity/user.entity';
+import { UserPaymentMethod } from 'src/entity/user_payment_method.entity';
 import { Like, Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService {
     constructor(
-        @InjectRepository(User) readonly userRepo: Repository<User>
-    ){}
+        @InjectRepository(User) readonly userRepo: Repository<User>,
+        @InjectRepository(UserPaymentMethod) private readonly userPaymentMethodRepo: Repository<UserPaymentMethod>,
+    ) { }
 
     async getListUser(query: PaginateFilter): Promise<any> {
         const items_per_page = Number(query.items_per_page) || 10;
@@ -72,5 +75,21 @@ export class UsersService {
     async deleleUser(id: number) {
         return await this.userRepo.delete(id);
     }
-
+    //
+    async createUserPaymentMethod(userPatmentMethodDto: CreateUserPaymentMethodDto) {
+        try {
+            await this.userPaymentMethodRepo.save(userPatmentMethodDto);
+            return new HttpException('created', HttpStatus.CREATED);
+        } catch (error) {
+            return new HttpException('Can not create data', HttpStatus.BAD_REQUEST);
+        }
+    }
+    async updateUserPaymentMethod(id: number, userPatmentMethodDto: CreateUserPaymentMethodDto) {
+        try {
+            await this.userPaymentMethodRepo.update( id , userPatmentMethodDto);
+            return new HttpException('updated', HttpStatus.OK);
+        } catch (error) {
+            return new HttpException('Can not update data'+error.message, HttpStatus.BAD_REQUEST);
+        }
+    }
 }

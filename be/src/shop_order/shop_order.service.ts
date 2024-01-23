@@ -4,7 +4,7 @@ import { CreateOrderDto } from 'src/dto/Create-Order.dto';
 import { OrderLine } from 'src/entity/order_line.entity';
 import { OrderStatus } from 'src/entity/order_status.entity';
 import { PaymentType } from 'src/entity/payment_type.entity';
-import { ShippingMethod } from 'src/entity/shipping_method.entity';
+
 import { ShopOrder } from 'src/entity/shop_order.entity';
 import { UserPaymentMethod } from 'src/entity/user_payment_method.entity';
 import { Between, Like, Raw, Repository } from 'typeorm';
@@ -13,17 +13,20 @@ import { ProductItem } from 'src/entity/product_item.entity';
 import { CreateShopOrderDto } from 'src/dto/create-shop_order.dto';
 import { CreateOrderLineDto } from 'src/dto/create-order_line.dto';
 
+import { ShippingMethod } from 'src/entity/shipping_method.entity';
+import { CreateShippingMethod } from 'src/dto/create-shipping-method.dto';
+
 @Injectable()
 export class ShopOrderService {
 
   constructor(
     @InjectRepository(OrderStatus) private readonly orderStatusRepo: Repository<OrderStatus>,
     @InjectRepository(ShippingMethod) private readonly shippingMethodRepo: Repository<ShippingMethod>,
-    @InjectRepository(UserPaymentMethod) private readonly userPaymentMethodRepo: Repository<UserPaymentMethod>,
+    // @InjectRepository(UserPaymentMethod) private readonly userPaymentMethodRepo: Repository<UserPaymentMethod>,
     @InjectRepository(OrderLine) private readonly orderLineRepo: Repository<OrderLine>,
     @InjectRepository(PaymentType) private readonly paymentTypeRepo: Repository<PaymentType>,
     @InjectRepository(ShopOrder) private readonly shopOrderRepo: Repository<ShopOrder>,
-    @InjectRepository(ProductItem) private readonly productItemRepo: Repository<ProductItem>,
+    // @InjectRepository(ProductItem) private readonly productItemRepo: Repository<ProductItem>,
   ) { }
 
   async createOrder(createOrderDto: CreateOrderDto) { //CreateOrderDto
@@ -163,9 +166,9 @@ export class ShopOrderService {
       if (!item) {
         return new HttpException('Can not find this item.', HttpStatus.NOT_FOUND);
       }
-     // console.log(updateShopOrderDto,id);
+      // console.log(updateShopOrderDto,id);
       return await this.shopOrderRepo.update(id, updateShopOrderDto);
-    } catch (error:any) {
+    } catch (error: any) {
       return new HttpException('Can not update this item .' + error.message, HttpStatus.BAD_REQUEST);
     }
 
@@ -178,4 +181,33 @@ export class ShopOrderService {
       return new HttpException('Can not delete this item', HttpStatus.BAD_REQUEST);
     }
   }
+  // order ststus
+  async create_orderStatus(createStatus: { name: string }) {
+    try {
+      await this.orderStatusRepo.save(createStatus);
+      return new HttpException('success', HttpStatus.CREATED);
+    } catch (error) {
+      return new HttpException('Can not create this item', HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async createShippingMethod(createShippingMethodDto: { name: string, price:string}) {
+    try {
+      const newIt = this.shippingMethodRepo.create(createShippingMethodDto);
+      await this.shippingMethodRepo.save(newIt);
+      return new HttpException('success', HttpStatus.CREATED);
+    } catch (error) {
+      return new HttpException('Can not create this item', HttpStatus.BAD_REQUEST);
+    }
+  }
+  async createPaymentType(createPaymentTypeDto: { type: string}) {
+    try {
+      const newIt= this.paymentTypeRepo.create(createPaymentTypeDto);
+      await this.shippingMethodRepo.save(newIt);
+      return new HttpException('success', HttpStatus.CREATED);
+    } catch (error) {
+      return new HttpException('Can not create this item', HttpStatus.BAD_REQUEST);
+    }
+  }
+
 }

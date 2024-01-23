@@ -10,6 +10,6 @@ export class ShippingMethod {
     @Column()
     price: string;
 
-    @OneToMany(type => ShopOrder, order => order.payment_method)
-    shop_orders: ShopOrder[];
+    @OneToMany(() => ShopOrder, order => order.payment_method)
+    shop_orders : ShopOrder[];
 }
