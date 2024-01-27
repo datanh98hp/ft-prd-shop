@@ -11,7 +11,7 @@ export class UserReview {
     rate_vaue: number;
 
     @Column()
-    comment: number;
+    comment: string;
 
     @ManyToOne(() => User, (user) => user.reviews)
     user: User;

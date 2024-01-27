@@ -5,6 +5,8 @@ import { UpdateUserDto } from 'src/dto/UpdateUser.dto';
 import { User } from 'src/entity/user.entity';
 import { UsersService } from './users.service';
 import { CreateUserPaymentMethodDto } from 'src/dto/create-user-payment-method.dto';
+import { CreateUserAddressDto } from 'src/dto/create-user-address.dto';
+import { CreateUserReviewDto } from 'src/dto/create-user-review.dto';
 
 @Controller('users')
 export class UsersController {
@@ -53,5 +55,26 @@ export class UsersController {
     @Patch('/update-user-payment/:id')
     async updateUserPaymentMethod(@Param() id: number, @Body() updatePatmentMethodDto: CreateUserPaymentMethodDto) {
         return await this.userServive.updateUserPaymentMethod(id, updatePatmentMethodDto);
+    }
+
+    @Post('/create-user-address')
+    async createUserAddress(@Body() createUserAddrDto: CreateUserAddressDto){
+        return this.userServive.createUserAddress(createUserAddrDto)
+    }
+    @Patch('update-user-address/:id')
+    async updateUserAddress(@Param() id:string,@Body() updateUserAddrDto: CreateUserAddressDto) {
+        return this.userServive.updateUserAddress(+id,updateUserAddrDto);
+    }
+
+    // user review
+
+    @Post('/create-user-review')
+    async createUserReview(@Body() createUserReviewDto: CreateUserReviewDto){
+        // 
+        return await this.userServive.createUserReview(createUserReviewDto);
+    }
+    @Delete('/delete-user-review/:id')
+    async deleteUserReview(@Param() id:string){
+        return await this.userServive.deleteUserReview(+id)
     }
 }

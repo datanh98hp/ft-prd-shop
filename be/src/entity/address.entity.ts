@@ -1,6 +1,7 @@
-import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Country } from "./country.entity";
 import { ShopOrder } from "src/entity/shop_order.entity";
+import { UserAddress } from "./user_address.entity";
 
 @Entity()
 export class Address {
@@ -19,10 +20,11 @@ export class Address {
     @Column({ nullable: true })
     postal_code: string;
 
-    @OneToOne(() => Country)
-    @JoinColumn()
+    @ManyToOne(() => Country, (country) => country.address)
     country: Country;
 
+    // @OneToMany(type => UserAddress, usrAddr => usrAddr.)
+    // user_address: UserAddress[];
 
     @OneToMany(type => ShopOrder, order => order.shipping_address)
     orders: ShopOrder[];

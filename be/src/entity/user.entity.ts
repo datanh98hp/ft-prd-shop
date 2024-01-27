@@ -3,6 +3,7 @@ import { Post } from "./post.entity";
 import { ShopOrder } from "src/entity/shop_order.entity";
 import { UserPaymentMethod } from "src/entity/user_payment_method.entity";
 import { UserReview } from "src/dto/user_review.entity";
+import { UserAddress } from "./user_address.entity";
 
 @Entity()
 export class User {
@@ -44,6 +45,9 @@ export class User {
 
     @OneToMany(type => UserReview, review => review.user)
     reviews: UserReview[];
+
+    @OneToMany(type => UserAddress, addr => addr.user)
+    address: UserAddress[]
 
     
 }
