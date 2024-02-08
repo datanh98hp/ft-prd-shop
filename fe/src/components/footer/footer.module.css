@@ -1,0 +1,27 @@
+.container {
+    padding: 30px 20px;
+
+}
+
+.container ul {
+    list-style: none;
+    margin: 8px 0;
+}
+
+.footer_contact li {
+    border: 1px solid #DDDDDD;
+    padding: 10px;
+}
+
+.footer_contact li span {
+    margin-left: 10px;
+}
+
+.container h3 {
+    margin: 20px 0;
+    text-transform: uppercase;
+}
+
+.footer_more li {
+    line-height: 24px;
+}

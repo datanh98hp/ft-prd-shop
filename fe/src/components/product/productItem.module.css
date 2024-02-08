@@ -1,0 +1,39 @@
+@media (max-width: 700px) {
+    .product_item {
+        position: relative;
+        width: 100%;
+    }
+    .discount {
+        position: absolute;
+        top: 30px;
+        width: 42px;
+        height: 42px;
+        background-color: #000;
+        text-align: center;
+        line-height: 42px;
+    }
+    .discount span {
+        color: #fff;
+        font-weight: bolder;
+    }
+    .circle_btn {
+        position: absolute;
+        top: 5px;
+        right: 15px;
+        border: none;
+    }
+    .old_price {
+        margin-right: 10px;
+        text-decoration: line-through;
+        color: #666;
+    }
+    .info p {
+        font-weight: bold;
+        font-size: 15px;
+        text-transform: uppercase;
+        margin: 8px 0;
+    }
+    .info p, .info > div {
+        text-align: center;
+    }
+}
