@@ -1,67 +1,91 @@
 import Image from "next/image";
 import styles from "./page.module.css";
+import Link from "next/link";
+
+import Products from "@/components/product/products";
+import Feedbacks from "@/components/feedback/feedbacks";
+import Footer from "@/components/footer/footer";
+import Header from "@/components/header/header";
 
 export default function Home() {
   return (
     <main className={styles.main}>
-      {/* https://koinclothing.vn/wp-content/uploads/2023/03/logokoin-thumbnail.png */}
-      {/* https://koinclothing.vn/wp-content/uploads/2023/11/ao-thun-unisex-oversize-koin-clothing-banner.webp */}
-      <div className={styles.header}>
-        <section className={styles.header_deal}>
-          <p>ƯU ĐÃI - Giảm ngay</p>
+      <Header />
+      <div className={styles.banner}>
+        <section className={styles.banner_img} style={{ textAlign: "center" }}>
+          <Image
+            src={
+              "https://koinclothing.vn/wp-content/uploads/2023/11/ao-thun-unisex-oversize-koin-clothing-banner.webp"
+            }
+            alt={"Banner"}
+            sizes="100vw"
+            width={"520"}
+            height={"688"}
+            // style={{
+            //   width: "100%",
+            //   height: "auto",
+            // }}
+          ></Image>
         </section>
-        <section className={styles.header_nav}>
-          <div className={styles.header_menu}>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 50 50"
-              width="22"
-              height="22"
-            >
-              <path d="M 0 9 L 0 11 L 50 11 L 50 9 Z M 0 24 L 0 26 L 50 26 L 50 24 Z M 0 39 L 0 41 L 50 41 L 50 39 Z" />
-            </svg>
-            <ul className={styles.menu_sub}>
-              <li>Giới thiệu</li>
-              <li>Sản phẩm</li>
-              <li>Khuyến Mại</li>
-              <li>Cách chọn size</li>
-              <li>Liên hệ</li>
-            </ul>
-          </div>
-          <div className={styles.header_logo}>
-            <Image
-              src={
-                "https://koinclothing.vn/wp-content/uploads/2023/03/logokoin-thumbnail.png"
-              }
-              alt={"Logo"}
-              width={97}
-              height={97}
-            ></Image>
-          </div>
-          <div className={styles.header_heart}>
-            <svg
-              fill="#000000"
-              height="20"
-              width="20"
-              version="1.1"
-              id="Capa_1"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 471.701 471.701"
-            >
-              <g>
-                <path
-                  d="M433.601,67.001c-24.7-24.7-57.4-38.2-92.3-38.2s-67.7,13.6-92.4,38.3l-12.9,12.9l-13.1-13.1
-                    c-24.7-24.7-57.6-38.4-92.5-38.4c-34.8,0-67.6,13.6-92.2,38.2c-24.7,24.7-38.3,57.5-38.2,92.4c0,34.9,13.7,67.6,38.4,92.3
-                    l187.8,187.8c2.6,2.6,6.1,4,9.5,4c3.4,0,6.9-1.3,9.5-3.9l188.2-187.5c24.7-24.7,38.3-57.5,38.3-92.4
-                    C471.801,124.501,458.301,91.701,433.601,67.001z M414.401,232.701l-178.7,178l-178.3-178.3c-19.6-19.6-30.4-45.6-30.4-73.3
-                    s10.7-53.7,30.3-73.2c19.5-19.5,45.5-30.3,73.1-30.3c27.7,0,53.8,10.8,73.4,30.4l22.6,22.6c5.3,5.3,13.8,5.3,19.1,0l22.4-22.4
-                    c19.6-19.6,45.7-30.4,73.3-30.4c27.6,0,53.6,10.8,73.2,30.3c19.6,19.6,30.3,45.6,30.3,73.3
-                    C444.801,187.101,434.001,213.101,414.401,232.701z"
-                />
-              </g>
-            </svg>
-          </div>
+        <section
+          className={styles.banner_heading}
+          style={{
+            padding: "40px 10px",
+            display: "flex",
+            alignItems: "center",
+            flexDirection: "column",
+            fontSize: "15px",
+            lineHeight: "1.5",
+            wordSpacing: "2px",
+          }}
+        >
+          <h2
+            style={{
+              marginBottom: "40px",
+              fontSize: "32px",
+              textAlign: "center",
+              width: "60%",
+            }}
+          >
+            ÁO THUN LOCAL BRAND FORM OVERSIZE
+          </h2>
+          <p>Chào mừng bạn đến với Thương hiệu Koin Clothing!</p>
+          <div>{"."}</div>
+          <p>
+            {"Chuyên cung cấp "}
+            Áo thun nam nữ Form Oversize
+            {" trẻ trung và năng động."}
+          </p>
+          <p>– Chất liệu: Vải 100% Cotton 2 Chiều (Định lượng: 250Gsm).</p>
+          <p>– Phần cổ Bo Rib giúp cổ áo không bị giãn theo thời gian.</p>
+          <p>– Form áo Oversize (M, L, XL) phù hợp với nhiều kiểu hình thể.</p>
+          <p>
+            – Hỗ trợ đổi/trả miễn phí nếu khách hàng không hài lòng về sản phẩm.
+          </p>
         </section>
+      </div>
+      <div className={styles.products}>
+        <div className={styles.latest}>
+          <h2 style={{ margin: "0 0 20px", textAlign: "center" }}>Latest</h2>
+          <Products />
+        </div>
+        <div className={styles.bestSelling}>
+          <h2 style={{ margin: "20px 0", textAlign: "center" }}>
+            Best Selling
+          </h2>
+          <Products />
+          <Link href={"#"} className={styles.showMore}>
+            Show More
+          </Link>
+        </div>
+      </div>
+      <div className={styles.feedback}>
+        <h2 style={{ textAlign: "center" }}>Awesome Feedback</h2>
+        <Feedbacks />
+      </div>
+
+      <div className={styles.footer}>
+        <Footer></Footer>
       </div>
     </main>
   );

@@ -1,0 +1,33 @@
+@media (max-width: 700px) {
+    .header {
+        height: 147px;
+      }
+      .header_deal {
+        height: 45px;
+        background-color: #a8a8a8;
+        padding-top: 15px;
+        text-align: center;
+      }
+      .header_nav {
+        padding: 5px 20px;
+        height: 102px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .header_menu .menu_sub {
+        display: none;
+        position: absolute;
+        list-style: none;
+      }
+      .header_menu:hover .menu_sub {
+        display: block;
+      }
+      .header_menu .menu_sub li {
+        line-height: 48px;
+        font-size: 24px;
+      }
+      .header_menu .menu_sub li:active {
+        background-color: #3f444b;
+      }
+}
