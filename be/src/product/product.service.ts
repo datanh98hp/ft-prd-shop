@@ -28,26 +28,28 @@ export class ProductService {
     const skip = (page - 1) * items_per_page;
 
     const sortBy = query.sortBy; //'DESC' || "ASC"
-    const product_cate_id = query.product_cate_id;
+    const product_cate_id = query.product_cate_id || null;
     // search
 
     const keyword = query.keyword;
 
+    console.log(keyword)
     console.log(product_cate_id)
     switch (product_cate_id) {
-      case undefined:
+      case null:
         const [res, total] = await this.productRepo.findAndCount({
           order: {
             created_at: sortBy ? 'ASC' : "DESC"
           },
-          where: [
+          where:
+            // [
             // title: keyword ? Like(`%${keyword}%`) : null,
             // subtitle: keyword ? Like(`%${keyword}%`) : null,
             { name: Like(`%${keyword}%`) },
-            // {
-            //   category: { id: product_cate_id }
-            // }
-          ],
+          // {
+          //   category: { id: product_cate_id }
+          // }
+          // ],
 
           cache: true,
           take: items_per_page,
@@ -77,14 +79,18 @@ export class ProductService {
           order: {
             created_at: sortBy ? 'ASC' : "DESC"
           },
-          where: [
-            // title: keyword ? Like(`%${keyword}%`) : null,
-            // subtitle: keyword ? Like(`%${keyword}%`) : null,
-            { name: Like(`%${keyword}%`) },
-            {
-              category: { id: product_cate_id }
-            }
-          ],
+          where:
+            [
+              // title: keyword ? Like(`%${keyword}%`) : null,
+              // subtitle: keyword ? Like(`%${keyword}%`) : null,
+              {
+                name: Like(`%${keyword}%`),
+              },
+              {
+                category: { id: product_cate_id }
+              }
+
+            ],
 
           cache: true,
           take: items_per_page,
@@ -104,11 +110,11 @@ export class ProductService {
         const previousPage2 = page - 1 < 1 ? null : page - 1;
         return {
           data: res2,
-          total2,
+          total: total2,
           currentPage: page,
-          nextPage2,
-          previousPage2,
-          lastPage2,
+          nextPage: nextPage2,
+          previousPage: previousPage2,
+          lastPage: lastPage2,
         };
     }
 
