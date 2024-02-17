@@ -7,10 +7,6 @@ import { ShopOrder } from "./shop_order.entity";
 export class UserPaymentMethod {
     @PrimaryGeneratedColumn()
     id: number;
-    @Column()
-    // name: string;
-    // @Column()
-    price: string;
 
     @ManyToOne(() => User, (user) => user.payment_methods)
     user: User;

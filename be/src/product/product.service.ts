@@ -15,7 +15,7 @@ export class ProductService {
     const newPrd = this.productRepo.create(createProductDto);
     const itemNew = await this.productRepo.save(newPrd);
     if (!itemNew) {
-      throw new HttpException('error',HttpStatus.BAD_REQUEST);
+      throw new HttpException('error', HttpStatus.BAD_REQUEST);
     }
     throw new HttpException('success', HttpStatus.CREATED);
   }

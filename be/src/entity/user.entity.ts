@@ -2,7 +2,7 @@ import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, Up
 import { Post } from "./post.entity";
 import { ShopOrder } from "src/entity/shop_order.entity";
 import { UserPaymentMethod } from "src/entity/user_payment_method.entity";
-import { UserReview } from "src/dto/user_review.entity";
+import { UserReview } from "src/entity/user_review.entity";
 
 @Entity()
 export class User {

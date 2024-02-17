@@ -4,7 +4,7 @@ import { UserPaymentMethod } from "./user_payment_method.entity";
 import { Address } from "src/entity/address.entity";
 import { ShippingMethod } from "./shipping_method.entity";
 import { OrderLine } from "./order_line.entity";
-import { UserReview } from "src/dto/user_review.entity";
+import { UserReview } from "src/entity/user_review.entity";
 import { OrderStatus } from "./order_status.entity";
 
 @Entity()

@@ -19,10 +19,11 @@ export class Address {
     @Column({ nullable: true })
     postal_code: string;
 
-    @OneToOne(() => Country)
-    @JoinColumn()
-    country: Country;
-
+    // @OneToOne(() => Country)
+    // @JoinColumn()
+    // country: Country;
+    @OneToMany(type => Country, country => country.address)
+    country: Country[];
 
     @OneToMany(type => ShopOrder, order => order.shipping_address)
     orders: ShopOrder[];

@@ -4,7 +4,7 @@ import { AddressService } from './address.service';
 import { AddressController } from './address.controller';
 import { Country } from '../entity/country.entity';
 import { Address } from '../entity/address.entity';
-import { UserAddress } from '../dto/user_address.entity';
+import { UserAddress } from '../entity/user_address.entity';
 
 @Module({
   imports: [

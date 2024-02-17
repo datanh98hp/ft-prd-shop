@@ -1,5 +1,5 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
-import { Address } from "../entity/address.entity";
+import { Address } from "./address.entity";
 import { User } from "src/entity/user.entity";
 
 @Entity()
@@ -14,6 +14,6 @@ export class UserAddress {
     @JoinColumn()
     country: Address
 
-    @Column()
+    @Column({nullable:true})
     isDefault: string;
 }
