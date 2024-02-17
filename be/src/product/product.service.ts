@@ -34,7 +34,6 @@ export class ProductService {
     const keyword = query.keyword;
 
     console.log(product_cate_id)
-
     switch (product_cate_id) {
       case undefined:
         const [res, total] = await this.productRepo.findAndCount({
