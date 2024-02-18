@@ -51,16 +51,51 @@ export class ProductItemService {
       },
       transaction: true,
       where: [
-        { sku: Like(`%${sku}%`) },
+        { 
+          sku: Like(`%${sku}%`),
+          product:{
+            name: Like(`%${keyword}%`)
+          }
+        },
       ],
       cache: true,
       take: items_per_page,
       skip: skip,
+      // select:{
+      //   id:true,
+      //   qty_in_stock:true,
+      //   product_images:true,
+      //   price:true,
+      //   product:{
+      //     id:true,
+      //     name:true,
+      //     description:true,
+      //     product_images:true,
+      //     // category:{
+      //     //   id:true,
+      //     //   promotions:{
+      //     //     promotion:{
+      //     //       id:true,
+      //     //       name:true,
+      //     //       discount_rate:true,
+      //     //       start_date:true,
+      //     //       end_date:true,
+      //     //     }
+      //     //   }
+      //     // }
+      //   }
+      // },
       relations:
       {
-        cart_items: true,
-        product: true,
-        product_configurations: true
+        // cart_items: true,
+        product: {
+          category:{
+            promotions:{
+              promotion:true
+            },
+          },
+        },
+        
       }
 
     });
