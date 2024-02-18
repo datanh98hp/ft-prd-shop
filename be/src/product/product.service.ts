@@ -31,12 +31,12 @@ export class ProductService {
     const product_cate_id = query.product_cate_id || null;
     // search
 
-    const keyword = query.keyword;
+    const keyword = query.keyword || '';
 
     console.log(keyword)
     console.log(product_cate_id)
-    switch (product_cate_id) {
-      case null:
+    // switch (product_cate_id) {
+    //   case null:
         const [res, total] = await this.productRepo.findAndCount({
           order: {
             created_at: sortBy ? 'ASC' : "DESC"
@@ -45,7 +45,7 @@ export class ProductService {
             // [
             // title: keyword ? Like(`%${keyword}%`) : null,
             // subtitle: keyword ? Like(`%${keyword}%`) : null,
-            { name: Like(`%${keyword}%`) },
+            { name: Like(`%${keyword}%`), category: { id: product_cate_id } },
           // {
           //   category: { id: product_cate_id }
           // }
@@ -74,49 +74,49 @@ export class ProductService {
           previousPage,
           lastPage,
         };
-      default:
-        const [res2, total2] = await this.productRepo.findAndCount({
-          order: {
-            created_at: sortBy ? 'ASC' : "DESC"
-          },
-          where:
-            [
-              // title: keyword ? Like(`%${keyword}%`) : null,
-              // subtitle: keyword ? Like(`%${keyword}%`) : null,
-              {
-                name: Like(`%${keyword}%`),
-              },
-              {
-                category: { id: product_cate_id }
-              }
+    //   default:
+    //     const [res2, total2] = await this.productRepo.findAndCount({
+    //       order: {
+    //         created_at: sortBy ? 'ASC' : "DESC"
+    //       },
+    //       where:
+    //         [
+    //           // title: keyword ? Like(`%${keyword}%`) : null,
+    //           // subtitle: keyword ? Like(`%${keyword}%`) : null,
+    //           {
+    //             name: Like(`%${keyword}%`),
+    //           },
+    //           {
+    //             category: { id: product_cate_id }
+    //           }
 
-            ],
+    //         ],
 
-          cache: true,
-          take: items_per_page,
-          skip: skip,
-          relations:
-          {
-            items: true,
-            category: true
-          }
+    //       cache: true,
+    //       take: items_per_page,
+    //       skip: skip,
+    //       relations:
+    //       {
+    //         items: true,
+    //         category: true
+    //       }
 
-        });
+    //     });
 
-        const lastPage2 = Math.ceil(total2 / items_per_page);
+    //     const lastPage2 = Math.ceil(total2 / items_per_page);
 
-        const nextPage2 = page + 1 ? null : page + 1;
+    //     const nextPage2 = page + 1 ? null : page + 1;
 
-        const previousPage2 = page - 1 < 1 ? null : page - 1;
-        return {
-          data: res2,
-          total: total2,
-          currentPage: page,
-          nextPage: nextPage2,
-          previousPage: previousPage2,
-          lastPage: lastPage2,
-        };
-    }
+    //     const previousPage2 = page - 1 < 1 ? null : page - 1;
+    //     return {
+    //       data: res2,
+    //       total: total2,
+    //       currentPage: page,
+    //       nextPage: nextPage2,
+    //       previousPage: previousPage2,
+    //       lastPage: lastPage2,
+    //     };
+    // }
 
   }
 
