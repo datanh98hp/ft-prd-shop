@@ -64,7 +64,6 @@ export class ProductController {
   remove(@Param('id') id: string) {
     return this.productService.remove(+id);
   }
-
   // update image product
   @Put('image/:idImg')
   @UseInterceptors(FileInterceptor('product_image', {
