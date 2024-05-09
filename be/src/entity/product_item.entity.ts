@@ -12,8 +12,8 @@ export class ProductItem {
     sku: string;
     @Column({default:0})
     qty_in_stock: number;
-    @Column()
-    product_images: string;
+    @Column({nullable:true})
+    product_images?: string;
     @Column({default:0})
     price: number;
     @ManyToOne(() => Product, (prd) => prd.items)

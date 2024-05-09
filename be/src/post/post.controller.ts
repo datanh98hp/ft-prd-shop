@@ -55,7 +55,7 @@ export class PostController {
             }
         }
     }))
-    async update(@Param('id') id: number, @Body() post: PostDto, @Req() req: Request, @UploadedFile() file: Express.Multer.File) {
+    async update(@Param('id') id: number, @Body() post: any, @Req() req: Request, @UploadedFile() file: Express.Multer.File) {
         const oldPost = await this.postService.getPost(id);
         if (!oldPost) {
             return {
@@ -63,26 +63,18 @@ export class PostController {
                 messsage:"Can not found item"
             }
         }
-       
+        
         const thummUrl = oldPost.thumb;
-        // const tem = thummUrl.split('/');
-        this.delFileExist(thummUrl)
-        // const pathFile = `upload/${tem[1]}/${tem[2]}`;
-        // if (fs.existsSync(pathFile)) {
-        //     fs.unlink(pathFile, (err) => {
-        //         if (err) {
-        //             console.log(err);
-        //         }
-        //         console.log(`deleted file "${pathFile}"`);
-        //     })
-        // }
-        const host = (await req).headers.host;
-        const updateUrlThumb = this.getUrlFromPath(host,file.path);
-        console.log(updateUrlThumb);
+        if (thummUrl===null) {
+            this.delFileExist(thummUrl)
+            const host = (await req).headers.host;
+            const updateUrlThumb = this.getUrlFromPath(host, file.path);
+            console.log(updateUrlThumb);
+        }
         return await this.postService.update(+id, {
-            ... post,
-            thumb:updateUrlThumb
+            ...post,
         });
+    
     }
     private delFileExist(url:string){
         const tem = url.split('/');
@@ -98,7 +90,6 @@ export class PostController {
     }
     @Delete(':id')
     async delete(@Param('id') id: number) {
-
         return await this.postService.delete(id);
     }
 

@@ -2,22 +2,27 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateProductDto } from '../dto/create-product.dto';
 import { UpdateProductDto } from '../dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Product } from 'src/entity/product.entity';
+import { Product } from '../entity/product.entity';
 import { Like, Repository } from 'typeorm';
+import { ImagesProduct } from '../entity/images_product.entity';
+import { CreateImageProductDto } from '../dto/create-Image-product.dto';
+
+
 
 @Injectable()
 export class ProductService {
   constructor(
     @InjectRepository(Product) private readonly productRepo: Repository<Product>,
+    @InjectRepository(ImagesProduct) private readonly productImageRepo: Repository<ImagesProduct>,
   ) { }
 
-  async create(createProductDto: CreateProductDto) {
+  async create(createProductDto: CreateProductDto): Promise<Product> {
     const newPrd = this.productRepo.create(createProductDto);
     const itemNew = await this.productRepo.save(newPrd);
     if (!itemNew) {
       throw new HttpException('error', HttpStatus.BAD_REQUEST);
     }
-    throw new HttpException('success', HttpStatus.CREATED);
+    return itemNew;
   }
 
   async findAll(query) {
@@ -30,99 +35,49 @@ export class ProductService {
     const sortBy = query.sortBy; //'DESC' || "ASC"
     const product_cate_id = query.product_cate_id || null;
     // search
+    const keyword = query.keyword || null;
 
-    const keyword = query.keyword || '';
+    // console.log("Keyword :", keyword)
+    // console.log("product_cate_id :", product_cate_id)
 
-    console.log(keyword)
-    console.log(product_cate_id)
-    // switch (product_cate_id) {
-    //   case null:
-        const [res, total] = await this.productRepo.findAndCount({
-          order: {
-            created_at: sortBy ? 'ASC' : "DESC"
-          },
-          where:
-            // [
-            // title: keyword ? Like(`%${keyword}%`) : null,
-            // subtitle: keyword ? Like(`%${keyword}%`) : null,
-            { name: Like(`%${keyword}%`), category: { id: product_cate_id } },
-          // {
-          //   category: { id: product_cate_id }
-          // }
-          // ],
+    const [res, total] = await this.productRepo.findAndCount({
+      order: {
+        created_at: sortBy
+      },
+      where:
+      {
+        name: keyword ? Like(`%${keyword}%`) : null,
+        category: { id: product_cate_id }
+      },
+      cache: true,
+      take: items_per_page,
+      skip: skip,
+      relations:
+      {
+        // items: true,
+        category: true
+      }
 
-          cache: true,
-          take: items_per_page,
-          skip: skip,
-          relations:
-          {
-            items: true,
-            category: true
-          }
+    });
+    const lastPage = Math.ceil(total / items_per_page);
 
-        });
-        const lastPage = Math.ceil(total / items_per_page);
+    const nextPage = page + 1 ? null : page + 1;
 
-        const nextPage = page + 1 ? null : page + 1;
-
-        const previousPage = page - 1 < 1 ? null : page - 1;
-        return {
-          data: res,
-          total,
-          currentPage: page,
-          nextPage,
-          previousPage,
-          lastPage,
-        };
-    //   default:
-    //     const [res2, total2] = await this.productRepo.findAndCount({
-    //       order: {
-    //         created_at: sortBy ? 'ASC' : "DESC"
-    //       },
-    //       where:
-    //         [
-    //           // title: keyword ? Like(`%${keyword}%`) : null,
-    //           // subtitle: keyword ? Like(`%${keyword}%`) : null,
-    //           {
-    //             name: Like(`%${keyword}%`),
-    //           },
-    //           {
-    //             category: { id: product_cate_id }
-    //           }
-
-    //         ],
-
-    //       cache: true,
-    //       take: items_per_page,
-    //       skip: skip,
-    //       relations:
-    //       {
-    //         items: true,
-    //         category: true
-    //       }
-
-    //     });
-
-    //     const lastPage2 = Math.ceil(total2 / items_per_page);
-
-    //     const nextPage2 = page + 1 ? null : page + 1;
-
-    //     const previousPage2 = page - 1 < 1 ? null : page - 1;
-    //     return {
-    //       data: res2,
-    //       total: total2,
-    //       currentPage: page,
-    //       nextPage: nextPage2,
-    //       previousPage: previousPage2,
-    //       lastPage: lastPage2,
-    //     };
-    // }
+    const previousPage = page - 1 < 1 ? null : page - 1;
+    return {
+      data: res,
+      total,
+      currentPage: page,
+      nextPage,
+      previousPage,
+      lastPage,
+    };
 
   }
 
   async findOne(id: number) {
     try {
-      return await this.productRepo.findOne({
+      const item = await this.productRepo.findOne({
         where: { id },
         relations:
         {
@@ -130,17 +85,30 @@ export class ProductService {
           category: true
         }
       });
+      if (item) {
+        return item;
+      }
+      return {
+        message: 'Not found item'
+      }
     } catch (error) {
-      throw new HttpException('Not found item', HttpStatus.NOT_FOUND);
+      return new HttpException('Error', HttpStatus.BAD_REQUEST);
     }
 
   }
 
   async update(id: number, updateProductDto: UpdateProductDto) {
     try {
-      return await this.productRepo.update(id, updateProductDto);
+      const item = await this.productRepo.findOneBy({ id });
+      if (item) {
+        return await this.productRepo.update(id, updateProductDto);
+      }
+      return {
+        message: 'Not found item to update'
+      }
+
     } catch (error) {
-      throw new HttpException('Not found item to update', HttpStatus.NOT_FOUND);
+      return new HttpException('Error', HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -148,8 +116,33 @@ export class ProductService {
     try {
       return await this.productRepo.delete(id);
     } catch (error) {
-      throw new HttpException('Can not delete this product, that product have items', HttpStatus.NOT_FOUND);
+      return new HttpException('Can not delete this product, that product have items', HttpStatus.NOT_FOUND);
     }
 
+  }
+  //////////////// PRODUCT IMAGE
+
+  async createProductImage(imagesProduct: CreateImageProductDto) {
+    try {
+      const newPrd = this.productImageRepo.create(imagesProduct);
+      const itemNew = await this.productImageRepo.save(newPrd);
+      if (itemNew) {
+        return itemNew;
+      }
+      return {}
+    } catch (error) {
+      throw new HttpException('error', HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async updateImageProduct(idImg: number, imagesProduct: any) {
+    try {
+      const item = await this.productImageRepo.findOneBy({ id: idImg });
+      if (item) {
+        return await this.productImageRepo.update({ id: idImg }, imagesProduct);
+      }
+    } catch (error) {
+      throw new HttpException('Error', HttpStatus.BAD_REQUEST);
+    }
   }
 }

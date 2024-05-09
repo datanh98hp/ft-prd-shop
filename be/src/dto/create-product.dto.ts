@@ -1,4 +1,5 @@
-import { IsNotEmpty } from "class-validator";
+import { IsEmpty, IsNotEmpty } from "class-validator";
+import { ImagesProduct } from "src/entity/images_product.entity";
 import { ProductCategory } from "src/entity/product_category.entity";
 
 export class CreateProductDto {
@@ -6,9 +7,8 @@ export class CreateProductDto {
     name:string;
     @IsNotEmpty()
     description:string;
-    @IsNotEmpty()
-    product_images:string;
+    @IsEmpty()
+    product_images?:ImagesProduct[];
     @IsNotEmpty()
     category:ProductCategory;
-
 }

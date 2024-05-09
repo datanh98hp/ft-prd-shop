@@ -7,7 +7,7 @@ import { storeConfig } from 'config/store.config';
 import * as fs from 'fs';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { AboutDto } from 'src/dto/AboutDto.dto';
-import { Request } from 'supertest';
+import { Request } from 'express';
 
 import { AboutService } from './about.service';
 
@@ -44,11 +44,10 @@ export class AboutController {
         const temp = file.path.split('/')
         const url = `${host}/${temp[1]}/${temp[2]}`;
         await this.aboutService.updateLogo(url); // host/logo/{filename}
-        return "OK";
+        return url;
     }
 
     @Put('banners')
-
     @UseInterceptors(FileFieldsInterceptor([
         {
             name: 'banners', maxCount: 5,
@@ -67,11 +66,10 @@ export class AboutController {
             }
         }))
     async updateBanners(@Req() req: Request, @UploadedFiles() files: { banners: Express.Multer.File[] }) {
-        //
+       
         const oldData = await this.aboutService.getAbout();
         if (oldData && oldData.banners && oldData.banners.length > 0){
             const list = oldData.banners.split(',');
-            
             list.map(item => {
                 const tem = item.split('/');
                 const path = `upload/${tem[1]}/${tem[2]}`;
@@ -97,31 +95,36 @@ export class AboutController {
             return listFile.toString();
         }
         throw new HttpException('Error',HttpStatus.BAD_REQUEST);
-        // 
+        
        
     }
 
     @Put('delete_files')
-    async deleteFiles(@Body() filePaths: Array<string>) {
+    async deleteFiles(@Body() data: { filePaths: Array<string> }) {
+        const filePaths = data.filePaths;
         if (!filePaths && filePaths.length == 0) {
+            console.log('Not file found.');
             return {
                 statusCode: HttpStatus.NOT_FOUND,
                 message: 'Not file found.'
             }
         }
         filePaths.map(item => {
-            if (fs.existsSync(item)) {
-                fs.unlink(item, (err) => {
+            if (fs.existsSync(`upload/${item}`)) {
+                fs.unlink(`./upload/${item}`, (err) => {
                     if (err) {
                         console.log(err);
                     }
                     console.log(`deleted file "${item}"`);
                 })
+                this.aboutService.updateAboutWithAttribute({ logo: "" })
+            }
+            return {
+                statusCode: HttpStatus.NOT_FOUND,
+                message: 'File not exist.'
             }
         });
-
     }
-
 }
 
 

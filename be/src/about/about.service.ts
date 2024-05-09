@@ -16,6 +16,9 @@ export class AboutService {
     async updateAbout(about: AboutDto) {
         return await this.aboutRepo.update({ id: 1 }, about);
     }
+    async updateAboutWithAttribute(data) {
+        return await this.aboutRepo.update({ id: 1 }, data);
+    }
     async updateLogo(logoPath: string) {
         return await this.aboutRepo.update({ id: 1 }, {
             logo:logoPath

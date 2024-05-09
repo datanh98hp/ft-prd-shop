@@ -26,15 +26,20 @@ export class PostService {
 
         const [res, total] = await this.postRepostory.findAndCount({
             order: {
-                created_at: sortBy ? 'ASC' : "DESC"
+                created_at: sortBy,id: sortBy
             },
-            where: [
-                // title: keyword ? Like(`%${keyword}%`) : null,
-                // subtitle: keyword ? Like(`%${keyword}%`) : null,
-                { title: Like(`%${keyword}%`) },
-                { subtitle: Like(`%${keyword}%`) },
-                { slug: Like(`%${keyword}%`) },
-            ],
+            where:{
+                title: keyword ? Like(`%${keyword}%`) : null,
+                subtitle: keyword ? Like(`%${keyword}%`) : null,
+                slug: keyword ? Like(`%${keyword}%`) : null,
+            },
+            // where: [
+            //     // title: keyword ? Like(`%${keyword}%`) : null,
+            //     // subtitle: keyword ? Like(`%${keyword}%`) : null,
+            //     { title: Like(`%${keyword}%`) },
+            //     { subtitle: Like(`%${keyword}%`) },
+            //     { slug: Like(`%${keyword}%`) },
+            // ],
             take: items_per_page,
             skip: skip,
             relations:
@@ -46,7 +51,7 @@ export class PostService {
                 author: {
                     id: true,
                     email: true,
-                    usermame: true,
+                    username: true,
                     profileImg: true,
                     role: true
                 }
@@ -79,7 +84,7 @@ export class PostService {
                     author:{
                         id:true,
                         email:true,
-                        usermame:true,
+                        username:true,
                         profileImg:true,
                         role:true
                     }
@@ -98,8 +103,10 @@ export class PostService {
 
     }
 
-    async update(id: number, post: PostDto) {
-        return await this.postRepostory.update({ id }, post);
+    async update(id: number, post: any) {
+        return await this.postRepostory.update({ id }, {
+            ...post
+        });
     }
 
     async delete(id: number) {

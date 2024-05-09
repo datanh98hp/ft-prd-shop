@@ -12,7 +12,7 @@ export class Post {
     @Column()
     slug: string;
     @Column({ nullable: true })
-    thumb: string;
+    thumb?: string;
     @Column({ type: 'text' })
     content: string;
 

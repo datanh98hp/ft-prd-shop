@@ -10,9 +10,9 @@ export class AuthService {
     constructor(
         @InjectRepository(User) private readonly userRepository: Repository<User>,
         private readonly jwtService: JwtService
-    ){}
+    ) { }
 
-    async signIn(auth:AuthDto){
+    async signIn(auth: AuthDto) {
         console.log(`login with ${JSON.stringify(auth.email)}`);
 
         const user = await this.userRepository.findOneBy({ email: auth.email })
@@ -39,42 +39,42 @@ export class AuthService {
     }
     async register(user: AuthDto): Promise<any> {
         try {
-        // find
-        const existUserEmail = await this.userRepository.findOneBy({ email: user.email })
-        if (!existUserEmail) {
+            // find
+            const existUserEmail = await this.userRepository.findOneBy({ email: user.email })
+            if (!existUserEmail) {
 
-            const hashPassword = await this.hashPassword(user.password)
-            // handle before create new user
+                const hashPassword = await this.hashPassword(user.password)
+                // handle before create new user
 
-            const userNew = await this.userRepository.save({
-                ...user,
-                password: hashPassword,
-                refresh_token: "refresh_token_string"
-            });
+                const userNew = await this.userRepository.save({
+                    ...user,
+                    password: hashPassword,
+                    refresh_token: "refresh_token_string"
+                });
 
+                return {
+                    error: false,
+                    status: 'success',
+                    data: {
+                        id: userNew.id,
+                        username: userNew.username,
+                        email: userNew.email,
+                        role: userNew.role,
+                        created_at: userNew.created_at
+                    }
+                };
+
+            }
+            //throw new HttpException('Email is used by other user',HttpStatus.BAD_REQUEST)
             return {
-                error: false,
-                status: 'success',
-                data: {
-                    id: userNew.id,
-                    username: userNew.usermame,
-                    email: userNew.email,
-                    role: userNew.role,
-                    created_at: userNew.created_at
-                }
-            };
-
-        }
-        //throw new HttpException('Email is used by other user',HttpStatus.BAD_REQUEST)
-        return {
-            error: true,
-            message: "Email is used by other user"
-        }
+                error: true,
+                message: "Email is used by other user"
+            }
         } catch (error) {
             //throw new HttpException('Eror request' + error, HttpStatus.BAD_REQUEST)
             return {
                 error: true,
-                message: error
+                message: error.message
             }
         }
 
@@ -123,7 +123,20 @@ export class AuthService {
             }
         }
     }
+    async getProfile(token: string) {
 
+        token = token.split(' ')[1];
+        const userInf = await this.jwtService.verifyAsync(token, {
+            secret: process.env.JWT_SECRET_STRING
+        });
+        const userCurrent = await this.userRepository.findOne(
+            {
+                where: { id: userInf.id },
+                select: ['id', 'username', 'email', 'role', 'bio', 'profileImg', 'created_at', 'updated_at']
+            }
+        );
+        return userCurrent;
+    }
     private async hashPassword(password: string): Promise<string> {
         const saltRound = 10;
         const salt = await bcrypt.genSalt(saltRound)

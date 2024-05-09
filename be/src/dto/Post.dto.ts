@@ -9,7 +9,7 @@ export class PostDto {
     @IsNotEmpty()
     slug: string
     // @IsNotEmpty()
-    thumb: string;
+    thumb?: string;
     @IsNotEmpty()
     content: string;
     @IsNotEmpty()

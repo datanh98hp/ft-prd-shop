@@ -26,11 +26,11 @@ export class UsersService {
                 created_at: sortBy ? 'ASC' : "DESC"
             },
             where: [
-                { usermame: Like(`%${keyword}%`) },
+                { username: Like(`%${keyword}%`) },
                 { email: Like(`%${keyword}%`) },
                 { role: Like(`%${keyword}%`) },
             ],
-            select: ['id', 'usermame', 'email', 'role', 'profileImg', 'created_at', 'updated_at'],
+            select: ['id', 'username', 'email', 'role', 'profileImg', 'created_at', 'updated_at'],
             take: items_per_page,
             skip: skip,
 

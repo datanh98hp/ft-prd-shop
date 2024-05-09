@@ -1,6 +1,7 @@
 import { ProductCategory } from "src/entity/product_category.entity";
 import { ProductItem } from "src/entity/product_item.entity";
 import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { ImagesProduct } from "./images_product.entity";
 
 @Entity()
 export class Product {
@@ -10,8 +11,9 @@ export class Product {
     name: string;
     @Column()
     description: string;
-    @Column()
-    product_images: string;
+
+    @OneToMany(() => ImagesProduct, (item) => item.product, { nullable: true })
+    product_images?: ImagesProduct[]
 
     @ManyToOne(() => ProductCategory, (cate) => cate.prducts)
     category: ProductCategory
