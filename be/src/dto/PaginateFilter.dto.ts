@@ -6,5 +6,9 @@ export class PaginateFilter {
     keyword: string;
     //add option for Product_category
     variation_id?: string;
-    promotion_id?: string;
+    promotion_category_id?: string;
+    /// add option for Product_item
+    sku?: string;
+    product_id?: string;
+    
 }

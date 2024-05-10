@@ -15,9 +15,8 @@ export class Product {
     @OneToMany(() => ImagesProduct, (item) => item.product, { nullable: true })
     product_images?: ImagesProduct[]
 
-    @ManyToOne(() => ProductCategory, (cate) => cate.prducts)
+    @ManyToOne(() => ProductCategory, (cate) => cate.products)
     category: ProductCategory
-
 
     @OneToMany(() => ProductItem, (item) => item.product)
     items: ProductItem[]

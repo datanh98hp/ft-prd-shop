@@ -13,7 +13,7 @@ export class ProductCategoryService {
     @InjectRepository(ProductCategory) private readonly productCategoryRepo: Repository<ProductCategory>
   ) { }
 
-  async create(createProductCategoryDto: CreateProductCategoryDto) {
+  async create(createProductCategoryDto: CreateProductCategoryDto): Promise<ProductCategory> {
     const newPrcate = this.productCategoryRepo.create(createProductCategoryDto)
     return await this.productCategoryRepo.save(newPrcate);
   }
@@ -28,7 +28,7 @@ export class ProductCategoryService {
 
 
     const variation_id = Number(query.variation_id) || null;
-    const promotion_id = Number(query.promotion_id) || null;
+    const promotion_category_id = Number(query.promotion_category_id) || null;
     // search
 
     const keyword = query.keyword || null;
@@ -43,8 +43,8 @@ export class ProductCategoryService {
         variations: {
           id: variation_id
         },
-        promotions: {
-          id: promotion_id
+        promotion_category: {
+          id: promotion_category_id
         }
       },
       cache: true,
@@ -53,13 +53,16 @@ export class ProductCategoryService {
       relations:
       {
         parent_category: true,
-        prducts: true,
-        promotions: true,
+        products: true,
+        promotion_category: true,
         variations: true
       }
       ,
       select: {
-        parent_category: {}
+        parent_category: { id: true, category_name: true },
+        products: { id: true, name: true, product_images: true, description: true },
+        promotion_category: { id: true },
+        variations: { id: true }
       }
     });
 
@@ -84,9 +87,19 @@ export class ProductCategoryService {
       {
         cache: true,
         where: { id },
-        relations: ['parent_category'],
+        relations:
+        {
+          parent_category: true,
+          products: true,
+          promotion_category: true,
+          variations: true
+        }
+        ,
         select: {
-          parent_category: {}
+          parent_category: { id: true, category_name: true },
+          products: { id: true, name: true },
+          promotion_category: { id: true },
+          variations: { id: true }
         }
       }
     );
@@ -98,14 +111,16 @@ export class ProductCategoryService {
 
   async update(id: number, updateProductCategoryDto: UpdateProductCategoryDto) {
     try {
-      return await this.productCategoryRepo.update({ id }, updateProductCategoryDto);
+      await this.productCategoryRepo.update({ id }, updateProductCategoryDto);
+      return new HttpException("Update success", HttpStatus.OK);
     } catch (err) {
       return new HttpException("Not found item to update", HttpStatus.NOT_FOUND);
     }
   }
   async remove(id: number) {
     try {
-      return await this.productCategoryRepo.delete(id);
+      await this.productCategoryRepo.delete(id);
+      return new HttpException("Delete success", HttpStatus.OK);
     } catch (err) {
       return new HttpException("Not found item to delete", HttpStatus.NOT_FOUND);
     }

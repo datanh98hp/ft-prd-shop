@@ -1,4 +1,9 @@
+import { ProductCategory } from "src/entity/product_category.entity";
+import { PromotionCategory } from "src/entity/promotion_category.entity";
+
 export class CreateProductCategoryDto {
-    parent_category_id:number;
     category_name:string;
+    parent_category?: ProductCategory;
+    promotion_category?: PromotionCategory;
+
 }

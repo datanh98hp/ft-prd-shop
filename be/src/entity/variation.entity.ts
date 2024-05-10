@@ -7,7 +7,7 @@ export class Variation {
     @PrimaryGeneratedColumn()
     id: number;
     @Column()
-    category_name: string;
+    variation_name: string;
 
     @ManyToOne(() => ProductCategory, (cate) => cate.variations, { nullable: true })
     category: ProductCategory;

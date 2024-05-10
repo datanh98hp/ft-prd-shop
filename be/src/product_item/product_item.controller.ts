@@ -2,9 +2,9 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestj
 import { ProductItemService } from './product_item.service';
 import { CreateProductItemDto } from '../dto/create-product_item.dto';
 import { UpdateProductItemDto } from '../dto/update-product_item.dto';
-import { ProductItemFilterPaginateDto } from 'src/dto/ProductItemFilterPaginate.dto';
 import { UpdateProductConfigurationDto } from 'src/dto/update-product_configuration.dto';
 import { CreateProductConfigurationDto } from 'src/dto/create-product_configuration.dto';
+import { PaginateFilter } from 'src/dto/PaginateFilter.dto';
 
 @Controller('product-item')
 export class ProductItemController {
@@ -18,13 +18,8 @@ export class ProductItemController {
   }
 
   @Get()
-  findAll(@Query() query: ProductItemFilterPaginateDto) {
+  findAll(@Query() query: PaginateFilter) {
     return this.productItemService.findAll(query);
-  }
-  @Get('filter')
-  filter(@Query() query: ProductItemFilterPaginateDto) {
-    
-    return this.productItemService.filter(query);
   }
 
   @Get(':id')
