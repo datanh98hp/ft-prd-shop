@@ -26,26 +26,36 @@ export class ProductCategoryService {
 
     const sortBy = query.sortBy; //'DESC' || "ASC"
 
+
+    const variation_id = Number(query.variation_id) || null;
+    const promotion_id = Number(query.promotion_id) || null;
     // search
 
-    const keyword = query.keyword;
+    const keyword = query.keyword || null;
 
     const [res, total] = await this.productCategoryRepo.findAndCount({
       order: {
-        id: sortBy ? 'ASC' : "DESC"
+        id: sortBy == "ASC" ? 'ASC' : "DESC"
       },
-      where: [
-        // title: keyword ? Like(`%${keyword}%`) : null,
-        // subtitle: keyword ? Like(`%${keyword}%`) : null,
-        { category_name: Like(`%${keyword}%`) }
-      ],
+      where:
+      {
+        category_name: keyword ? Like(`%${keyword}%`) : null,
+        variations: {
+          id: variation_id
+        },
+        promotions: {
+          id: promotion_id
+        }
+      },
+      cache: true,
       take: items_per_page,
       skip: skip,
       relations:
       {
         parent_category: true,
-        prducts:true,
-        variations:true
+        prducts: true,
+        promotions: true,
+        variations: true
       }
       ,
       select: {
