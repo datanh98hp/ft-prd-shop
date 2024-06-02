@@ -47,17 +47,33 @@ export class ProductService {
       where:
       {
         name: keyword ? Like(`%${keyword}%`) : null,
-        category: { id: product_cate_id }
+        category: { id: product_cate_id },
+
       },
       cache: true,
       take: items_per_page,
       skip: skip,
       relations:
       {
-        // items: true,
-        category: true
+        items: true,
+        category: {
+          variations: true,
+          promotion_category: {
+            promotion: true
+          }
+        },
+        product_images: true
+      },
+      select:
+      {
+        items: {
+          id: true,
+          qty_in_stock: true
+        },
+        product_images: {
+          path: true
+        }
       }
-
     });
     const lastPage = Math.ceil(total / items_per_page);
 
@@ -82,11 +98,24 @@ export class ProductService {
         relations:
         {
           items: true,
-          category: true
+          category: {
+            variations: true,
+            promotion_category: {
+              promotion: true
+            }
+          },
+
+          product_images: true
+        },
+        select:{
+          items: {
+            id: true,
+            qty_in_stock: true
+          }
         }
       });
       if (item) {
-        return item;
+        return item ;
       }
       return {
         message: 'Not found item'

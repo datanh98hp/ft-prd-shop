@@ -6,6 +6,8 @@ export class CreateProductDto {
     @IsNotEmpty()
     name:string;
     @IsNotEmpty()
+    slug: string;
+    @IsNotEmpty()
     description:string;
     @IsEmpty()
     product_images?:ImagesProduct[];

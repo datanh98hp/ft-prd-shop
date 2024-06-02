@@ -52,17 +52,18 @@ export class ProductCategoryService {
       skip: skip,
       relations:
       {
+        child_categories: true,
         parent_category: true,
         products: true,
         promotion_category: true,
-        variations: true
+        variations: true,
       }
       ,
       select: {
         parent_category: { id: true, category_name: true },
         products: { id: true, name: true, product_images: true, description: true },
         promotion_category: { id: true },
-        variations: { id: true }
+        variations: { id: true },
       }
     });
 

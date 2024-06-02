@@ -9,6 +9,13 @@ export class Product {
     id: number;
     @Column()
     name: string;
+
+    @Column({ nullable: true, default: 'slug' })
+    slug: string;
+
+    @Column({ nullable: true, default: 0 })
+    original_price: number;
+
     @Column()
     description: string;
 
