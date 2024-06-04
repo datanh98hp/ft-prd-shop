@@ -48,7 +48,6 @@ export class ProductService {
       {
         name: keyword ? Like(`%${keyword}%`) : null,
         category: { id: product_cate_id },
-
       },
       cache: true,
       take: items_per_page,
@@ -56,6 +55,7 @@ export class ProductService {
       relations:
       {
         items: true,
+        brand: true,
         category: {
           variations: true,
           promotion_category: {
@@ -72,6 +72,9 @@ export class ProductService {
         },
         product_images: {
           path: true
+        },
+        brand:{
+            brand_name:true
         }
       }
     });

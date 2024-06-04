@@ -2,6 +2,7 @@ import { ProductCategory } from "src/entity/product_category.entity";
 import { ProductItem } from "src/entity/product_item.entity";
 import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { ImagesProduct } from "./images_product.entity";
+import { Brand } from "./brand.entity";
 
 @Entity()
 export class Product {
@@ -27,6 +28,9 @@ export class Product {
 
     @OneToMany(() => ProductItem, (item) => item.product)
     items: ProductItem[]
+
+    @ManyToOne(() => Brand, (brand) => brand.products)
+    brand: Brand
 
     @CreateDateColumn({ nullable: true })
     created_at: Date;
