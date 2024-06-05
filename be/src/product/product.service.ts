@@ -4,7 +4,7 @@ import { UpdateProductDto } from '../dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from '../entity/product.entity';
 import { Like, Repository } from 'typeorm';
-import { ImagesProduct } from '../entity/images_product.entity';
+import { Images } from '../entity/images.entity';
 import { CreateImageProductDto } from '../dto/create-Image-product.dto';
 
 
@@ -13,7 +13,7 @@ import { CreateImageProductDto } from '../dto/create-Image-product.dto';
 export class ProductService {
   constructor(
     @InjectRepository(Product) private readonly productRepo: Repository<Product>,
-    @InjectRepository(ImagesProduct) private readonly productImageRepo: Repository<ImagesProduct>,
+    @InjectRepository(Images) private readonly productImageRepo: Repository<Images>,
   ) { }
 
   async create(createProductDto: CreateProductDto): Promise<Product> {

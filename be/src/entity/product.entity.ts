@@ -1,7 +1,7 @@
 import { ProductCategory } from "src/entity/product_category.entity";
 import { ProductItem } from "src/entity/product_item.entity";
 import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { ImagesProduct } from "./images_product.entity";
+import { Images } from "./images.entity";
 import { Brand } from "./brand.entity";
 
 @Entity()
@@ -20,8 +20,8 @@ export class Product {
     @Column()
     description: string;
 
-    @OneToMany(() => ImagesProduct, (item) => item.product, { nullable: true })
-    product_images?: ImagesProduct[]
+    @OneToMany(() => Images, (item) => item.product, { nullable: true })
+    product_images?: Images[]
 
     @ManyToOne(() => ProductCategory, (cate) => cate.products)
     category: ProductCategory

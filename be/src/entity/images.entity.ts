@@ -1,10 +1,8 @@
-import { ProductCategory } from "src/entity/product_category.entity";
-import { ProductItem } from "src/entity/product_item.entity";
-import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Product } from "./product.entity";
 
 @Entity()
-export class ImagesProduct {
+export class Images {
     @PrimaryGeneratedColumn()
     id: number;
     @Column({
