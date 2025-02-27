@@ -26,6 +26,8 @@ export class AboutController {
     async updateAbout(@Body() about: AboutDto) {
         return await this.aboutService.updateAbout(about);
     }
+
+    
     @Put('logo')
     @UseInterceptors(FileInterceptor('logo', {
         storage: storeConfig('logo'),

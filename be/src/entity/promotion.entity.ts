@@ -21,5 +21,5 @@ export class Promotion {
     updated_at: Date;
 
     @OneToMany(() => PromotionCategory, (prmCate) => prmCate.promotion)
-    promotions: PromotionCategory[]
+    promotion_categories: PromotionCategory[]
 }

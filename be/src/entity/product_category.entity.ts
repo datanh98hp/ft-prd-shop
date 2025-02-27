@@ -12,6 +12,9 @@ export class ProductCategory {
     @Column()
     category_name: string;
 
+    @Column({ nullable: true })
+    category_img: string;
+
     @CreateDateColumn({ nullable: true })
     created_at: Date;
     @UpdateDateColumn({ nullable: true })

@@ -34,7 +34,8 @@ export class ProductService {
 
     const sortBy = query.sortBy; //'DESC' || "ASC"
     const product_cate_id = query.product_cate_id || null;
-    // search
+
+    // search by keyword
     const keyword = query.keyword || null;
 
     // console.log("Keyword :", keyword)
@@ -83,6 +84,7 @@ export class ProductService {
     const nextPage = page + 1 ? null : page + 1;
 
     const previousPage = page - 1 < 1 ? null : page - 1;
+    
     return {
       data: res,
       total,

@@ -19,6 +19,7 @@ import { AddressModule } from './address/address.module';
 import { ShopOrderModule } from './shop_order/shop_order.module';
 import { ShoppingCartModule } from './shopping_cart/shopping_cart.module';
 import { BrandModule } from './brand/brand.module';
+import { PageModule } from './page/page.module';
 
  
 @Module({
@@ -64,6 +65,7 @@ import { BrandModule } from './brand/brand.module';
     ShopOrderModule,
     ShoppingCartModule,
     BrandModule,
+    PageModule,
 
   ],
   controllers: [AppController],

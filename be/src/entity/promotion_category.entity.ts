@@ -10,6 +10,6 @@ export class PromotionCategory {
     @OneToMany(() => ProductCategory, (it) => it.promotion_category)
     product_category: ProductCategory[];
     
-    @ManyToOne(() => Promotion, (pr) => pr.promotions)
+    @ManyToOne(() => Promotion, (pr) => pr.promotion_categories)
     promotion: Promotion;
 }

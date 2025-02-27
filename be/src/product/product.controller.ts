@@ -37,6 +37,12 @@ export class ProductController {
     const prdNew = await this.productService.create(createProductDto);
     //
     const product_images_files = files.product_images;
+    if (product_images_files.length === 0) {
+        return {
+            message: 'File must not be empty',
+            status: 400
+        }
+    }
     product_images_files.map(async (img) => {
       const temp = img.path.split('/')
       let pathImg = temp[1] + '/' + temp[2];
