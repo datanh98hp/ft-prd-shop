@@ -3,6 +3,5 @@ import { Promotion } from "src/entity/promotion.entity";
 
 
 export class CreatePromotionCategoryDto {
-    category: ProductCategory;
     promotion: Promotion;
 }

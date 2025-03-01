@@ -10,15 +10,27 @@ import { PromotionCategory } from 'src/entity/promotion_category.entity';
 @Injectable()
 export class PromotionService {
   constructor(
-    @InjectRepository(Promotion) private readonly promoteRepo: Repository<Promotion>,
-    @InjectRepository(PromotionCategory) private readonly cateRepo: Repository<PromotionCategory>
-  ) { }
+    @InjectRepository(Promotion)
+    private readonly promoteRepo: Repository<Promotion>,
+    @InjectRepository(PromotionCategory)
+    private readonly cateRepo: Repository<PromotionCategory>,
+  ) {}
   async create(createPromotionDto: CreatePromotionDto): Promise<Promotion> {
     const newPromo = this.promoteRepo.create(createPromotionDto);
     return await this.promoteRepo.save(newPromo);
   }
 
-  async findAll(query: PaginateFilter): Promise<any> {
+  async findAll(query: PaginateFilter | any): Promise<any> {
+    console.log('promote service query', query);
+    if (Object.keys(query).length === 0 && query.constructor === Object) {
+      //
+      query = {
+        page: 1,
+        items_per_page: 10,
+        keyword: '',
+      };
+    }
+
     const items_per_page = Number(query.items_per_page) || 10;
     const page = Number(query.page) || 1;
 
@@ -32,7 +44,7 @@ export class PromotionService {
 
     const [res, total] = await this.promoteRepo.findAndCount({
       order: {
-        created_at: sortBy ? 'ASC' : "DESC"
+        created_at: sortBy === 'ASC' ? 'ASC' : 'DESC',
       },
       where: [
         // title: keyword ? Like(`%${keyword}%`) : null,
@@ -76,29 +88,30 @@ export class PromotionService {
   }
 
   async findOne(id: number): Promise<Promotion | any> {
-    const item = await this.promoteRepo.findOne(
-      {
-        cache: true,
-        where: { id },
-        relations: ['author'],
-        // select: {
-        //   author: {
-        //     id: true,
-        //     email: true,
-        //     usermame: true,
-        //     profileImg: true,
-        //     role: true
-        //   }
-        // }
-      }
-    );
+    const item = await this.promoteRepo.findOne({
+      cache: true,
+      where: { id },
+      relations: ['author'],
+      // select: {
+      //   author: {
+      //     id: true,
+      //     email: true,
+      //     usermame: true,
+      //     profileImg: true,
+      //     role: true
+      //   }
+      // }
+    });
     if (!item) {
       return new HttpException('Not found item', HttpStatus.NOT_FOUND);
     }
     return item;
   }
 
-  async update(id: number, updatePromotionDto: UpdatePromotionDto): Promise<any> {
+  async update(
+    id: number,
+    updatePromotionDto: UpdatePromotionDto,
+  ): Promise<any> {
     return await this.promoteRepo.update({ id }, updatePromotionDto);
   }
 
@@ -107,9 +120,7 @@ export class PromotionService {
   }
   // promotion_cate
 
-  async list_promotion_cates(query: {id,promotion_id,sortBy}){
+  async list_promotion_cates(query: { id; promotion_id; sortBy }) {
     return await this.cateRepo.findBy({});
   }
-
-  
 }

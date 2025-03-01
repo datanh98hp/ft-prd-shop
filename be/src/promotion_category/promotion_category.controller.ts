@@ -1,7 +1,7 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
-import { PromotionCategoryService } from './promotion_category.service';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { CreatePromotionCategoryDto } from '../dto/create-promotion_category.dto';
 import { UpdatePromotionCategoryDto } from '../dto/update-promotion_category.dto';
+import { PromotionCategoryService } from './promotion_category.service';
 
 @Controller('promotion-category')
 export class PromotionCategoryController {
@@ -22,7 +22,7 @@ export class PromotionCategoryController {
     return this.promotionCategoryService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(@Param('id') id: string, @Body() updatePromotionCategoryDto: UpdatePromotionCategoryDto) {
     return this.promotionCategoryService.update(+id, updatePromotionCategoryDto);
   }
