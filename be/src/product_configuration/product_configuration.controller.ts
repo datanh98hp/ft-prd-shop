@@ -1,30 +1,51 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { query } from 'express';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { ProductConfigurationService } from './product_configuration.service';
 import { CreateProductConfigurationDto } from '../dto/create-product_configuration.dto';
 import { UpdateProductConfigurationDto } from '../dto/update-product_configuration.dto';
+import { PaginateFilter } from 'src/dto/PaginateFilter.dto';
 
 @Controller('product-configuration')
 export class ProductConfigurationController {
-  constructor(private readonly productConfigurationService: ProductConfigurationService) {}
+  constructor(
+    private readonly productConfigurationService: ProductConfigurationService,
+  ) {}
 
   @Post()
   create(@Body() createProductConfigurationDto: CreateProductConfigurationDto) {
-    return this.productConfigurationService.create(createProductConfigurationDto);
+    return this.productConfigurationService.create(
+      createProductConfigurationDto,
+    );
   }
 
   @Get()
-  findAll() {
-    return this.productConfigurationService.findAll();
+  findAll(@Query() query: PaginateFilter) {
+    return this.productConfigurationService.findAll(query);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.productConfigurationService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    return await this.productConfigurationService.findOne(+id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProductConfigurationDto: UpdateProductConfigurationDto) {
-    return this.productConfigurationService.update(+id, updateProductConfigurationDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateProductConfigurationDto: UpdateProductConfigurationDto,
+  ) {
+    return this.productConfigurationService.update(
+      +id,
+      updateProductConfigurationDto,
+    );
   }
 
   @Delete(':id')

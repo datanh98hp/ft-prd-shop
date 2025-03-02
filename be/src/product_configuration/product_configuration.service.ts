@@ -1,22 +1,84 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { CreateProductConfigurationDto } from '../dto/create-product_configuration.dto';
 import { UpdateProductConfigurationDto } from '../dto/update-product_configuration.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ProductConfiguration } from 'src/entity/product_configuration.entity';
+import { Like, Repository } from 'typeorm';
+import { PaginateFilter } from 'src/dto/PaginateFilter.dto';
 
 @Injectable()
 export class ProductConfigurationService {
-  create(createProductConfigurationDto: CreateProductConfigurationDto) {
-    return 'This action adds a new productConfiguration';
+  constructor(
+    @InjectRepository(ProductConfiguration)
+    private readonly productConfigRepo: Repository<ProductConfiguration>,
+  ) {}
+  async create(createProductConfigurationDto: CreateProductConfigurationDto) {
+    return await this.productConfigRepo.save(createProductConfigurationDto);
   }
 
-  findAll() {
-    return `This action returns all productConfiguration`;
+  async findAll(query: PaginateFilter) {
+    const items_per_page = Number(query.items_per_page) || 10;
+    const page = Number(query.page) || 1;
+
+    const skip = (page - 1) * items_per_page;
+
+    const sortBy: string = query.sortBy; //'DESC' || "ASC"
+
+    const sku = query.sku || null;
+
+    const product_id = Number(query.product_id) || null;
+    const variation_option = Number(query.variation_option) || null;
+
+    const [res, total] = await this.productConfigRepo.findAndCount({
+      order: {
+        id: sortBy == 'ASC' ? 'ASC' : 'DESC',
+      },
+      transaction: true,
+      where: {
+        product_item: {
+          id: product_id,
+          sku: sku ? Like(`%${sku}%`) : null,
+        },
+        variation_option: {
+          id: variation_option,
+        },
+      },
+      cache: true,
+      take: items_per_page,
+      skip: skip,
+      relations: ['product_item', 'variation_option'],
+    });
+    const lastPage = Math.ceil(total / items_per_page);
+
+    const nextPage = page + 1 ? null : page + 1;
+
+    const previousPage = page - 1 < 1 ? null : page - 1;
+
+    return {
+      data: res,
+      total,
+      currentPage: page,
+      nextPage,
+      previousPage,
+      lastPage,
+    };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} productConfiguration`;
+  async findOne(id: number): Promise<ProductConfiguration | HttpException> {
+    try {
+      return await this.productConfigRepo.findOne({
+        where: { id },
+        relations: ['product_item', 'variation_option'],
+      });
+    } catch (error) {
+      return new HttpException('Not found', 404);
+    }
   }
 
-  update(id: number, updateProductConfigurationDto: UpdateProductConfigurationDto) {
+  update(
+    id: number,
+    updateProductConfigurationDto: UpdateProductConfigurationDto,
+  ) {
     return `This action updates a #${id} productConfiguration`;
   }
 

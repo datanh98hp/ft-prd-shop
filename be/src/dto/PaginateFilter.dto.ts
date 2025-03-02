@@ -10,7 +10,7 @@ export class PaginateFilter {
     /// add option for Product_item
     sku?: string;
     product_id?: string;
-    
+    variation_option?: string;
     constructor(data: PaginateFilter) {
         Object.assign(this, data);
     }
