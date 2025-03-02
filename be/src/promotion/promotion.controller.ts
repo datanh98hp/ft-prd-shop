@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  Put,
+} from '@nestjs/common';
 import { PromotionService } from './promotion.service';
 import { CreatePromotionDto } from '../dto/create-promotion.dto';
 import { UpdatePromotionDto } from '../dto/update-promotion.dto';
@@ -7,9 +17,7 @@ import { PaginateFilter } from 'src/dto/PaginateFilter.dto';
 
 @Controller('promotion')
 export class PromotionController {
-  constructor(
-    private readonly promotionService: PromotionService
-    ) {}
+  constructor(private readonly promotionService: PromotionService) {}
 
   @Post()
   create(@Body() createPromotionDto: CreatePromotionDto) {
@@ -17,7 +25,7 @@ export class PromotionController {
   }
 
   @Get()
-  findAll(@Query() query:PaginateFilter) {
+  findAll(@Query() query: PaginateFilter) {
     return this.promotionService.findAll(query);
   }
 
@@ -26,8 +34,11 @@ export class PromotionController {
     return this.promotionService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePromotionDto: UpdatePromotionDto) {
+  @Put(':id')
+  update(
+    @Param('id') id: string,
+    @Body() updatePromotionDto: UpdatePromotionDto,
+  ) {
     return this.promotionService.update(+id, updatePromotionDto);
   }
 
@@ -37,9 +48,8 @@ export class PromotionController {
   }
   // promotion_category
 
-  @Get('promotion-category')
-  async listCate(@Query() query: { id, promotion_id,sortBy} ):Promise<any>{
-    return await this.listCate(query);
+  @Get('promotion-category/list')
+  async listCate(id: number): Promise<any> {
+    return await this.promotionService.list_promotion_cates(id);
   }
-
 }

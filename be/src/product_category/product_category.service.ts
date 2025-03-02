@@ -8,14 +8,22 @@ import { PaginateFilter } from 'src/dto/PaginateFilter.dto';
 
 @Injectable()
 export class ProductCategoryService {
-
   constructor(
-    @InjectRepository(ProductCategory) private readonly productCategoryRepo: Repository<ProductCategory>
-  ) { }
+    @InjectRepository(ProductCategory)
+    private readonly productCategoryRepo: Repository<ProductCategory>,
+  ) {}
 
-  async create(createProductCategoryDto: CreateProductCategoryDto): Promise<ProductCategory> {
-    const newPrcate = this.productCategoryRepo.create(createProductCategoryDto)
-    return await this.productCategoryRepo.save(newPrcate);
+  async create(
+    createProductCategoryDto: CreateProductCategoryDto,
+  ): Promise<ProductCategory | HttpException> {
+    try {
+      const newPrcate = this.productCategoryRepo.create(
+        createProductCategoryDto,
+      );
+      return await this.productCategoryRepo.save(newPrcate);
+    } catch (error) {
+      return new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   async findAll(query: PaginateFilter) {
@@ -26,7 +34,6 @@ export class ProductCategoryService {
 
     const sortBy = query.sortBy; //'DESC' || "ASC"
 
-
     const variation_id = Number(query.variation_id) || null;
     const promotion_category_id = Number(query.promotion_category_id) || null;
     // search
@@ -35,36 +42,38 @@ export class ProductCategoryService {
 
     const [res, total] = await this.productCategoryRepo.findAndCount({
       order: {
-        id: sortBy == "ASC" ? 'ASC' : "DESC"
+        id: sortBy == 'ASC' ? 'ASC' : 'DESC',
       },
-      where:
-      {
+      where: {
         category_name: keyword ? Like(`%${keyword}%`) : null,
         variations: {
-          id: variation_id
+          id: variation_id,
         },
         promotion_category: {
-          id: promotion_category_id
-        }
+          id: promotion_category_id,
+        },
       },
       cache: true,
       take: items_per_page,
       skip: skip,
-      relations:
-      {
+      relations: {
         child_categories: true,
         parent_category: true,
         products: true,
         promotion_category: true,
         variations: true,
-      }
-      ,
+      },
       select: {
         parent_category: { id: true, category_name: true },
-        products: { id: true, name: true, product_images: true, description: true },
+        products: {
+          id: true,
+          name: true,
+          product_images: true,
+          description: true,
+        },
         promotion_category: { id: true },
         variations: { id: true },
-      }
+      },
     });
 
     const lastPage = Math.ceil(total / items_per_page);
@@ -84,46 +93,63 @@ export class ProductCategoryService {
   }
 
   async findOne(id: number) {
-    const item = await this.productCategoryRepo.findOne(
-      {
-        cache: true,
-        where: { id },
-        relations:
-        {
-          parent_category: true,
-          products: true,
-          promotion_category: true,
-          variations: true
-        }
-        ,
-        select: {
-          parent_category: { id: true, category_name: true },
-          products: { id: true, name: true },
-          promotion_category: { id: true },
-          variations: { id: true }
-        }
-      }
-    );
+    const item = await this.productCategoryRepo.findOne({
+      cache: true,
+      where: { id },
+      relations: {
+        parent_category: true,
+        products: true,
+        promotion_category: true,
+        variations: true,
+      },
+      select: {
+        parent_category: { id: true, category_name: true },
+        products: { id: true, name: true },
+        promotion_category: { id: true },
+        variations: { id: true },
+      },
+    });
     if (!item) {
-      return new HttpException("Not found item", HttpStatus.NOT_FOUND);
+      return new HttpException('Not found item', HttpStatus.NOT_FOUND);
     }
     return item;
   }
 
   async update(id: number, updateProductCategoryDto: UpdateProductCategoryDto) {
     try {
-      await this.productCategoryRepo.update({ id }, updateProductCategoryDto);
-      return new HttpException("Update success", HttpStatus.OK);
+      const res = await this.productCategoryRepo.update(
+        { id },
+        updateProductCategoryDto,
+      );
+      if (res.affected === 0) {
+        return new HttpException(
+          'Not found item to update',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      return new HttpException('Update success', HttpStatus.OK);
     } catch (err) {
-      return new HttpException("Not found item to update", HttpStatus.NOT_FOUND);
+      return new HttpException(
+        'Not found item to update',
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
   async remove(id: number) {
     try {
-      await this.productCategoryRepo.delete(id);
-      return new HttpException("Delete success", HttpStatus.OK);
+      const res = await this.productCategoryRepo.delete(id);
+      if (res.affected === 0) {
+        return new HttpException(
+          'Not found item to update',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      return new HttpException('Delete success', HttpStatus.OK);
     } catch (err) {
-      return new HttpException("Not found item to delete", HttpStatus.NOT_FOUND);
+      return new HttpException(
+        'Not found item to delete',
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
 }

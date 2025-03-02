@@ -88,39 +88,47 @@ export class PromotionService {
   }
 
   async findOne(id: number): Promise<Promotion | any> {
-    const item = await this.promoteRepo.findOne({
-      cache: true,
-      where: { id },
-      relations: ['author'],
-      // select: {
-      //   author: {
-      //     id: true,
-      //     email: true,
-      //     usermame: true,
-      //     profileImg: true,
-      //     role: true
-      //   }
-      // }
-    });
-    if (!item) {
+    try {
+      const item = await this.promoteRepo.findOneOrFail({
+        cache: true,
+        where: { id },
+        relations: ['promotion_categories'],
+      });
+
+      return item;
+    } catch (error) {
       return new HttpException('Not found item', HttpStatus.NOT_FOUND);
     }
-    return item;
   }
 
   async update(
     id: number,
     updatePromotionDto: UpdatePromotionDto,
   ): Promise<any> {
-    return await this.promoteRepo.update({ id }, updatePromotionDto);
+    const res = await this.promoteRepo.update({ id }, updatePromotionDto);
+    if (res.affected > 0) {
+      return new HttpException('Update success', HttpStatus.OK);
+    }
+    return new HttpException('Update failed', HttpStatus.NOT_MODIFIED);
   }
 
   async remove(id: number): Promise<any> {
-    return await this.promoteRepo.delete(id);
+    try {
+      const res = await this.promoteRepo.delete(id);
+      if (res.affected > 0) {
+        return new HttpException('Delete success', HttpStatus.OK);
+      }
+      return new HttpException('Delete failed', HttpStatus.BAD_REQUEST);
+    } catch (error) {
+      return new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
   // promotion_cate
 
-  async list_promotion_cates(query: { id; promotion_id; sortBy }) {
-    return await this.cateRepo.findBy({});
+  async list_promotion_cates(id: number): Promise<any> {
+    return await this.cateRepo.findOne({
+      where: { id },
+      relations: ['product_category', 'promotion'],
+    });
   }
 }
