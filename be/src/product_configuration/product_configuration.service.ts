@@ -1,4 +1,9 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import {
+  HttpCode,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { CreateProductConfigurationDto } from '../dto/create-product_configuration.dto';
 import { UpdateProductConfigurationDto } from '../dto/update-product_configuration.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -75,14 +80,34 @@ export class ProductConfigurationService {
     }
   }
 
-  update(
+  async update(
     id: number,
     updateProductConfigurationDto: UpdateProductConfigurationDto,
   ) {
-    return `This action updates a #${id} productConfiguration`;
+    try {
+      const res = await this.productConfigRepo.update(
+        { id },
+        updateProductConfigurationDto,
+      );
+
+      if (res.affected === 0) {
+        return new HttpException('Bad request', HttpStatus.BAD_REQUEST);
+      }
+    } catch (error) {
+      return new HttpException('Bad request', HttpStatus.BAD_REQUEST);
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} productConfiguration`;
+  async remove(id: number) {
+    try {
+      const res = await this.productConfigRepo.delete(id);
+
+      if (res.affected === 0) {
+        return new HttpException('Bad request', HttpStatus.BAD_REQUEST);
+      }
+      return new HttpException('Deleted', HttpStatus.OK);
+    } catch (error) {
+      return new HttpException('Bad request', HttpStatus.BAD_REQUEST);
+    }
   }
 }

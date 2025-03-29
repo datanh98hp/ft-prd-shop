@@ -8,6 +8,7 @@ import {
   Param,
   Delete,
   Query,
+  Put,
 } from '@nestjs/common';
 import { ProductConfigurationService } from './product_configuration.service';
 import { CreateProductConfigurationDto } from '../dto/create-product_configuration.dto';
@@ -37,7 +38,7 @@ export class ProductConfigurationController {
     return await this.productConfigurationService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(
     @Param('id') id: string,
     @Body() updateProductConfigurationDto: UpdateProductConfigurationDto,

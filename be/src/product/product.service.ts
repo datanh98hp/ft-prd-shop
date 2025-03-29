@@ -43,7 +43,7 @@ export class ProductService {
 
     const [res, total] = await this.productRepo.findAndCount({
       order: {
-        created_at: sortBy
+        created_at: sortBy === 'DESC' ? 'DESC' : 'ASC',
       },
       where:
       {

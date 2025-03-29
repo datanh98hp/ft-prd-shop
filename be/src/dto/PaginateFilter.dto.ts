@@ -11,6 +11,15 @@ export class PaginateFilter {
     sku?: string;
     product_id?: string;
     variation_option?: string;
+    // add option for Shop_order
+    order_status?: string;
+    shippingMethod?: string;
+    payment_method?: string;
+    userId?: string;
+    // add option for Shop_cart
+
+
+    //
     constructor(data: PaginateFilter) {
         Object.assign(this, data);
     }

@@ -20,6 +20,7 @@ import { ShopOrderModule } from './shop_order/shop_order.module';
 import { ShoppingCartModule } from './shopping_cart/shopping_cart.module';
 import { BrandModule } from './brand/brand.module';
 import { PageModule } from './page/page.module';
+import { SeedModule } from './seed/seed.module';
 
  
 @Module({
@@ -66,6 +67,7 @@ import { PageModule } from './page/page.module';
     ShoppingCartModule,
     BrandModule,
     PageModule,
+    SeedModule,
 
   ],
   controllers: [AppController],

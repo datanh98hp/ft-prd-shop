@@ -193,7 +193,11 @@ export class ProductItemService {
 
   async update(id: number, updateProductItemDto: UpdateProductItemDto) {
     try {
-      return await this.productItemRepo.update({ id }, updateProductItemDto);
+      const res = await this.productItemRepo.update({ id }, updateProductItemDto);
+      if(res.affected<=0){
+        return new HttpException('Update failed', HttpStatus.NOT_MODIFIED);
+      }
+      return new HttpException('Update success', HttpStatus.OK);
     } catch (error) {
       throw new HttpException('Not found item to update', HttpStatus.NOT_FOUND);
     }
@@ -201,7 +205,11 @@ export class ProductItemService {
 
   async remove(id: number) {
     try {
-      return await this.productItemRepo.delete(id);
+      const res = await this.productItemRepo.delete(id);
+      if (res.affected === 0) {
+        return new HttpException('Bad request', HttpStatus.BAD_REQUEST);
+      }
+      return new HttpException("Delete success",HttpStatus.OK);
     } catch (error) {
       throw new HttpException('Can not delete this product, that product have items', HttpStatus.NOT_FOUND);
     }

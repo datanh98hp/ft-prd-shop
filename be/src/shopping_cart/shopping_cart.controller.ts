@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { ShoppingCartService } from './shopping_cart.service';
 import { CreateShoppingCartDto } from '../dto/create-shopping_cart.dto';
 import { UpdateShoppingCartDto } from '../dto/update-shopping_cart.dto';
@@ -13,8 +13,8 @@ export class ShoppingCartController {
   }
 
   @Get()
-  findAll() {
-    return this.shoppingCartService.findAll();
+  async findAll(@Query() query: any) {
+    return await this.shoppingCartService.findAll(query);
   }
 
   @Get(':id')

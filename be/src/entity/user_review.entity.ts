@@ -8,10 +8,10 @@ export class UserReview {
     id: number;
 
     @Column()
-    rate_vaue: number;
+    rating: number;
 
-    @Column({nullable:true})
-    comment: number;
+    @Column({nullable:true,type:'text',default:null})
+    comment: string;
 
     @ManyToOne(() => User, (user) => user.reviews)
     user: User;

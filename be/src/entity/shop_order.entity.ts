@@ -1,43 +1,57 @@
-import { User } from "src/entity/user.entity";
-import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { UserPaymentMethod } from "./user_payment_method.entity";
-import { Address } from "src/entity/address.entity";
-import { ShippingMethod } from "./shipping_method.entity";
-import { OrderLine } from "./order_line.entity";
-import { UserReview } from "src/entity/user_review.entity";
-import { OrderStatus } from "./order_status.entity";
+import { User } from 'src/entity/user.entity';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { UserPaymentMethod } from './user_payment_method.entity';
+import { Address } from 'src/entity/address.entity';
+import { ShippingMethod } from './shipping_method.entity';
+import { OrderLine } from './order_line.entity';
+import { UserReview } from 'src/entity/user_review.entity';
+import { OrderStatus } from './order_status.entity';
 
 @Entity()
 export class ShopOrder {
-    @PrimaryGeneratedColumn()
-    id: number;
-    
-    @ManyToOne(() => User, (user) => user.orders)
-    user: User;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    //@Column({default:Date.now().toString()})
-    @CreateDateColumn({ nullable: true })
-    order_date: Date;
+  @ManyToOne(() => User, (user) => user.orders)
+  user: User;
 
-    @ManyToOne(() => UserPaymentMethod, (method) => method.payment_methods)
-    payment_method: UserPaymentMethod;
+  //@Column({default:Date.now().toString()})
+  @CreateDateColumn({ nullable: true })
+  order_date: Date;
 
-    @ManyToOne(() => Address, (address) => address.orders)
-    shipping_address: Address;
+  @ManyToOne(() => UserPaymentMethod, (method) => method.payment_methods)
+  payment_method: UserPaymentMethod;
 
-    @ManyToOne(() => ShippingMethod, (method) => method.shop_orders)
-    shippingMethod: ShippingMethod;
+  @ManyToOne(() => Address, (address) => address.orders)
+  shipping_address: Address;
 
-    @OneToMany(() => OrderLine, (lines) => lines.order)
-    order_lines: OrderLine[];
+  @ManyToOne(() => ShippingMethod, (method) => method.shop_orders)
+  shippingMethod: ShippingMethod;
 
-    @OneToMany(() => UserReview, (review) => review.revirew_order,{nullable:true})
-    review: UserReview[];
+  @OneToMany(() => OrderLine, (lines) => lines.order)
+  order_lines: OrderLine[];
 
-    @Column()
-    order_total: number;
+  @OneToMany(() => UserReview, (review) => review.revirew_order, {
+    nullable: true,
+  })
+  review: UserReview[];
 
-    @ManyToOne(() => OrderStatus, (stt) => stt.orders)
-    order_status: OrderStatus;
+  @Column()
+  order_total: number;
 
+  @ManyToOne(() => OrderStatus, (stt) => stt.orders)
+  order_status: OrderStatus;
+
+  @CreateDateColumn({ nullable: true })
+  created_at: Date;
+  @UpdateDateColumn({ nullable: true })
+  updated_at: Date;
 }
