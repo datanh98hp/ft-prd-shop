@@ -111,7 +111,11 @@ export class ShoppingCartService {
       take: items_per_page,
       skip: skip,
       relations: {
-        items: true,
+        items: {
+          product_item: {
+            product: true,
+          },
+        },
       },
       select: {
         items: {
@@ -140,16 +144,49 @@ export class ShoppingCartService {
     return await this.shoppingCartRepo.findOneByOrFail({ id });
   }
 
-  async update(id: number, updateShoppingCartDto: UpdateShoppingCartDto) {
-    return `This action updates a #${id} shoppingCart`;
+  async update(id: number, updateShoppingCartDto: UpdateShoppingCartDto) {}
+  async updateItem(idItem: number, qty: number) {
+    //UPDATE qty
+    try {
+    console.log(idItem, qty);
+    const item = await this.shoppingCartItemRepo.findOneByOrFail({
+      id: idItem,
+    });
+    const res = await this.shoppingCartItemRepo.update(idItem, {
+      ...item,
+      qty,
+    });
+    if (res.affected === 0) {
+      throw new HttpException('Fail', HttpStatus.BAD_REQUEST);
+    }
+      return new HttpException('Update success', HttpStatus.OK);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
-
+  async removeItemCart(idItems: number[]) {
+    try {
+      idItems.map(async (id) => {
+        const res = await this.shoppingCartItemRepo.delete({ id });
+        if (res.affected === 0) {
+          throw new HttpException('Fail', HttpStatus.BAD_REQUEST);
+        }
+      });
+      return new HttpException('Delete success', HttpStatus.OK);
+    } catch (error) {
+      throw new HttpException('Error', HttpStatus.BAD_REQUEST);
+    }
+  }
   async remove(id: number) {
     try {
       await this.shoppingCartItemRepo.delete({ cart: { id } });
       const res = await this.shoppingCartRepo.delete(id);
+      if (res.affected === 0) {
+        throw new HttpException('Fail', HttpStatus.BAD_REQUEST);
+      }
+      return new HttpException('Delete success', HttpStatus.OK);
     } catch (error) {
-      throw new HttpException('Error', HttpStatus.BAD_REQUEST);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 }

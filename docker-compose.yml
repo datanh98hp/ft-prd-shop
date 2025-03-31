@@ -58,7 +58,7 @@ services:
 
   db:
     image: postgres:17.4
-    restart: always
+    # restart: always
     ports:
       - '5432:5432'
     networks:
@@ -71,7 +71,7 @@ services:
       - POSTGRES_PASSWORD=prd06021998
   adminer:
     image: adminer
-    restart: always
+    # restart: always
     ports:
       - 8080:8080
     networks:

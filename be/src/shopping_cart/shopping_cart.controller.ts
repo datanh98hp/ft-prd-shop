@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  Put,
+} from '@nestjs/common';
 import { ShoppingCartService } from './shopping_cart.service';
 import { CreateShoppingCartDto } from '../dto/create-shopping_cart.dto';
 import { UpdateShoppingCartDto } from '../dto/update-shopping_cart.dto';
@@ -22,11 +32,22 @@ export class ShoppingCartController {
     return this.shoppingCartService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateShoppingCartDto: UpdateShoppingCartDto) {
+  @Put(':id')
+  update(
+    @Param('id') id: string,
+    @Body() updateShoppingCartDto: UpdateShoppingCartDto,
+  ) {
     return this.shoppingCartService.update(+id, updateShoppingCartDto);
   }
-
+  @Put('/item/:id')
+  updateItem(@Param('id') id: string, @Body() body: { qty: string }) {
+    const { qty } = body;
+    return this.shoppingCartService.updateItem(+id, +qty);
+  }
+  @Delete('/item/:id')
+  removeItemCart(@Body('ids') ids: number[]) {
+    return this.shoppingCartService.removeItemCart(ids);
+  }
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.shoppingCartService.remove(+id);
