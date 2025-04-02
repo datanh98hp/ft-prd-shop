@@ -2,14 +2,13 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
-  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
+  UpdateDateColumn
 } from 'typeorm';
-import { User } from './user.entity';
 import { ShoppingCartItem } from './shop_cart_item.entity';
+import { User } from './user.entity';
 
 @Entity()
 export class ShoppingCart {

@@ -31,7 +31,10 @@ export class ShoppingCartController {
   findOne(@Param('id') id: string) {
     return this.shoppingCartService.findOne(+id);
   }
-
+  @Get('/user/:idUser')
+  getCartByUser(@Param('idUser') idUser: string) {
+    return this.shoppingCartService.getCartByUser(+idUser);
+  }
   @Put(':id')
   update(
     @Param('id') id: string,

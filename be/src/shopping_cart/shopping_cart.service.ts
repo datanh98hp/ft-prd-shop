@@ -1,19 +1,16 @@
-import { query } from 'express';
 import {
   HttpException,
-  HttpExceptionBody,
   HttpStatus,
-  Injectable,
+  Injectable
 } from '@nestjs/common';
-import { CreateShoppingCartDto } from '../dto/create-shopping_cart.dto';
-import { UpdateShoppingCartDto } from '../dto/update-shopping_cart.dto';
-import { PaginateFilter } from 'src/dto/PaginateFilter.dto';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PaginateFilter } from 'src/dto/PaginateFilter.dto';
 import { ShoppingCart } from 'src/entity/shopping_cart.entity';
 import { Repository } from 'typeorm';
+import { CreateShoppingCartDto } from '../dto/create-shopping_cart.dto';
+import { UpdateShoppingCartDto } from '../dto/update-shopping_cart.dto';
 
 import { ShoppingCartItem } from 'src/entity/shop_cart_item.entity';
-import { ProductItem } from 'src/entity/product_item.entity';
 
 @Injectable()
 export class ShoppingCartService {
@@ -22,8 +19,7 @@ export class ShoppingCartService {
     private readonly shoppingCartRepo: Repository<ShoppingCart>,
     @InjectRepository(ShoppingCartItem)
     private readonly shoppingCartItemRepo: Repository<ShoppingCartItem>,
-    // @InjectRepository(ProductItem)
-    // private readonly productItemRepo: Repository<ProductItem>,
+    
   ) {}
   async create(createShoppingCartDto: CreateShoppingCartDto) {
     // check user cart id exist
@@ -141,14 +137,21 @@ export class ShoppingCartService {
   }
 
   async findOne(id: number) {
-    return await this.shoppingCartRepo.findOneByOrFail({ id });
+    return await this.shoppingCartRepo.findOne({
+      where: { id },
+      relations: { items: { product_item: { product: true } } },
+    });
   }
-
+  async getCartByUser(idUser: number) {
+    return await this.shoppingCartRepo.findOne({
+      where: { user: { id: idUser } },
+      relations: { items: { product_item: { product: true } } },
+    });
+  }
   async update(id: number, updateShoppingCartDto: UpdateShoppingCartDto) {}
   async updateItem(idItem: number, qty: number) {
     //UPDATE qty
-    try {
-    console.log(idItem, qty);
+    // try {
     const item = await this.shoppingCartItemRepo.findOneByOrFail({
       id: idItem,
     });
@@ -159,10 +162,10 @@ export class ShoppingCartService {
     if (res.affected === 0) {
       throw new HttpException('Fail', HttpStatus.BAD_REQUEST);
     }
-      return new HttpException('Update success', HttpStatus.OK);
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-    }
+    //   return new HttpException('Update success', HttpStatus.OK);
+    // } catch (error) {
+    //   throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    // }
   }
   async removeItemCart(idItems: number[]) {
     try {
