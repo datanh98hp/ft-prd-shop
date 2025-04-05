@@ -22,16 +22,25 @@ import { BrandModule } from './brand/brand.module';
 import { PageModule } from './page/page.module';
 import { SeedModule } from './seed/seed.module';
 
- 
+import { QueueModule } from './queue/queue.module';
+import { BullModule } from '@nestjs/bull';
+
 @Module({
   imports: [
-    // ServeStaticModule.forRoot({
-    //   rootPath: join(__dirname, '..','client'),
-    //   // renderPath:'/upload'
-    // }),
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot(
+      {
+        isGlobal: true,
+        envFilePath: ['.env'],
+      },
+    ),
+    BullModule.forRoot({
+      redis: {
+        host:  process.env.REDIS_HOST,
+        port: parseInt(process.env.REDIS_PORT),
+      },
+    }),
     TypeOrmModule.forRoot({
-      type: `postgres`,
+      type: 'postgres',
       host: process.env.POSTGRES_HOST,
       port: parseInt(process.env.POSTGRES_PORT),
       username: process.env.POSTGRES_USER,
@@ -39,8 +48,8 @@ import { SeedModule } from './seed/seed.module';
       database: process.env.POSTGRES_DB,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
-      autoLoadEntities:true
-      // 
+      autoLoadEntities: true,
+      //
       // type: 'mysql',
       // host: 'localhost',
       // port: 3306,
@@ -68,7 +77,7 @@ import { SeedModule } from './seed/seed.module';
     BrandModule,
     PageModule,
     SeedModule,
-
+    QueueModule,
   ],
   controllers: [AppController],
   providers: [AppService],

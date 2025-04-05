@@ -19,6 +19,42 @@ services:
       - '8001:8001'
     networks:
       - my_network
+  # order-service:
+  #   container_name: order-service
+  #   build:
+  #     context: ./order-service
+  #     dockerfile: ./Dockerfile #path Dockerfile in container
+  #     target: development
+  #   command: npm run start:dev
+  #   env_file:
+  #     - ./order-service/.env
+  #   depends_on:
+  #     - db
+  #     - adminer
+  #   volumes:
+  #     - ./order-service:/usr/src/app/
+  #     - /usr/src/app/node_modules
+   
+  #   networks:
+  #     - my_network
+  # products-service:
+  #   container_name: products-service
+  #   build:
+  #     context: ./products
+  #     dockerfile: ./Dockerfile #path Dockerfile in container
+  #     target: development
+  #   command: npm run start:dev
+  #   env_file:
+  #     - ./products/.env
+  #   depends_on:
+  #     - db
+  #     - adminer
+  #   volumes:
+  #     - ./be:/usr/src/app/
+  #     - /usr/src/app/node_modules
+
+  #   networks:
+  #     - my_network
   # fe:
   #   container_name: fe
     
@@ -46,15 +82,15 @@ services:
   #   networks:
   #     - my_network
 
-  # redis:
-  #   image: redis
-  #   restart: always
-  #   ports:
-  #     - '6379:6379'
-  #   volumes:
-  #     - redis:/data
-  #   networks:
-  #     - my_network
+  redis:
+    image: redis
+    # restart: always
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis:/data
+    networks:
+      - my_network
 
   db:
     image: postgres:17.4
@@ -70,7 +106,7 @@ services:
       - POSTGRES_USER=prd
       - POSTGRES_PASSWORD=prd06021998
   adminer:
-    image: adminer
+    image: adminer:standalone
     # restart: always
     ports:
       - 8080:8080

@@ -1,4 +1,4 @@
-FROM node:18 AS development
+FROM node:18 As development
 
 WORKDIR /usr/src/app
 
@@ -10,7 +10,7 @@ COPY . .
 
 RUN npm run build
 
-FROM node:18 AS production
+FROM node:18 as production
 
 ARG NODE_ENV=production
 
@@ -27,6 +27,6 @@ RUN npm build
 
 COPY --from=development /usr/src/app/dist ./dist
 
-CMD [ "node","be/dist/main" ]
+CMD [ "node","products-service/dist/main" ]
 
 
