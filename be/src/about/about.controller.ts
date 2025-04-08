@@ -99,7 +99,7 @@ export class AboutController {
         ...file,
       },
     } as QueueRequest;
-    //const jobU = await this.queueService.handleUploadQueue(contents);
+    const jobU = await this.queueService.handleUploadQueue(contents);
 
     return new HttpException('Update logo success', HttpStatus.OK);
   }
