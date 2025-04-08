@@ -73,17 +73,19 @@ export class AboutController {
   async updateLogo(@Req() req: any, @UploadedFile() file: Express.Multer.File) {
     const host = (await req).headers.host;
     const temp = file.path.split('/');
-    const url = `${host}/${temp[1]}/${temp[2]}`;
+    // const url = `${host}/${temp[1]}/${temp[2]}`;
+
+    const url = `${req.protocol}://${host}/${temp[1]}/${temp[2]}`;
     // delete old logo file
 
     const oldData = await this.aboutService.getAbout();
     if (oldData && oldData.logo) {
       const logoPath = oldData.logo;
       const tem = logoPath.split('/');
-      const path = `upload/${tem[1]}/${tem[2]}`;
+      const path = `upload/${tem[3]}/${tem[4]}`;
 
       this.removeFileExist(path);
-      const update = await this.aboutService.updateLogo(url);
+      await this.aboutService.updateLogo(url);
     } else {
       const update = await this.aboutService.updateLogo(url); // host/logo/{filename}
       if (!update) {
@@ -136,7 +138,7 @@ export class AboutController {
       const list = oldData.banners.split(',');
       list.map((item) => {
         const tem = item.split('/');
-        const path = `upload/${tem[1]}/${tem[2]}`;
+        const path = `upload/${tem[3]}/${tem[4]}`;
         // console.log(path)
         if (fs.existsSync(path)) {
           fs.unlink(path, (err) => {
@@ -147,16 +149,30 @@ export class AboutController {
           });
         }
       });
+
       ////
       const host = (await req).headers.host;
+
       const listFile: Array<string> = [];
-      files.banners.map((item) => {
+      files.banners.map(async (item) => {
         let temp = item.path.split('/');
-        let url = `${host}/${temp[1]}/${temp[2]}`;
+        let url = `${req.protocol}://${host}/${temp[1]}/${temp[2]}`;
         listFile.push(url);
+        //set queue upload
+
+        const contents = {
+          name: 'update-banner',
+          key: 'update-banner',
+          file: {
+            host,
+            ...item,
+          },
+        } as QueueRequest;
+        await this.queueService.handleUploadQueue(contents);
       });
+
       await this.aboutService.addBanners(listFile.toString());
-      return listFile.toString();
+      return new HttpException('Update banner is processing.', HttpStatus.OK);
     }
     throw new HttpException('Error', HttpStatus.BAD_REQUEST);
   }
