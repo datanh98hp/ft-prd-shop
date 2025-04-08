@@ -24,6 +24,7 @@ import { AboutDto } from 'src/dto/AboutDto.dto';
 import { AboutService } from './about.service';
 import { QueueRequest } from 'src/queue/request/queue.request';
 import { QueueService } from 'src/queue/queue.service';
+import { r } from '@faker-js/faker/dist/airline-CBNP41sR';
 
 @Controller('about')
 export class AboutController {
@@ -41,7 +42,19 @@ export class AboutController {
   async updateAbout(@Body() about: AboutDto) {
     return await this.aboutService.updateAbout(about);
   }
-
+  removeFileExist(path: string) {
+    console.log(path);
+    if (fs.existsSync(path)) {
+      fs.unlink(path, (err) => {
+        if (err) {
+          console.log(err);
+        }
+        console.log(`deleted file "${path}"`);
+      });
+    } else {
+      console.log(` file not exist "${path}"`);
+    }
+  }
   @Put('logo')
   @UseInterceptors(
     FileInterceptor('logo', {
@@ -61,7 +74,22 @@ export class AboutController {
     const host = (await req).headers.host;
     const temp = file.path.split('/');
     const url = `${host}/${temp[1]}/${temp[2]}`;
-    await this.aboutService.updateLogo(url); // host/logo/{filename}
+    // delete old logo file
+
+    const oldData = await this.aboutService.getAbout();
+    if (oldData && oldData.logo) {
+      const logoPath = oldData.logo;
+      const tem = logoPath.split('/');
+      const path = `upload/${tem[1]}/${tem[2]}`;
+
+      this.removeFileExist(path);
+      const update = await this.aboutService.updateLogo(url);
+    } else {
+      const update = await this.aboutService.updateLogo(url); // host/logo/{filename}
+      if (!update) {
+        return new HttpException('Not found', HttpStatus.NOT_FOUND);
+      }
+    }
     //set queue upload
     const contents = {
       name: 'update-logo',
@@ -71,16 +99,9 @@ export class AboutController {
         ...file,
       },
     } as QueueRequest;
-    const jobU = await this.queueService.handleUploadQueue(contents);
-    // await this.queueUpload.add(QueueName.upload, file, {
-    //   delay: 1000 * 3,
-    //   lifo: true,
-    //   priority: 3,
-    // });
-    //-----> OK
+    //const jobU = await this.queueService.handleUploadQueue(contents);
 
-    return new HttpException('Update success', HttpStatus.OK);
-    //return url;
+    return new HttpException('Update logo success', HttpStatus.OK);
   }
 
   @Put('banners')
