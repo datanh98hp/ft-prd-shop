@@ -21,19 +21,15 @@ import { Request } from 'express';
 import * as fs from 'fs';
 import { AboutDto } from 'src/dto/AboutDto.dto';
 
-import { QueueService } from 'src/queue/queue.service';
 import { AboutService } from './about.service';
-import { InjectQueue } from '@nestjs/bull';
-import { QueueName } from 'src/constants/queue';
-import { Queue } from 'bullmq';
 import { QueueRequest } from 'src/queue/request/queue.request';
+import { QueueService } from 'src/queue/queue.service';
 
 @Controller('about')
 export class AboutController {
   constructor(
     private aboutService: AboutService,
     private readonly queueService: QueueService,
-    // @InjectQueue(QueueName.upload) private readonly queueUpload: Queue,
   ) {}
 
   @Get()
@@ -62,21 +58,20 @@ export class AboutController {
     }),
   )
   async updateLogo(@Req() req: any, @UploadedFile() file: Express.Multer.File) {
-  
     const host = (await req).headers.host;
     const temp = file.path.split('/');
     const url = `${host}/${temp[1]}/${temp[2]}`;
     await this.aboutService.updateLogo(url); // host/logo/{filename}
     //set queue upload
     const contents = {
-        name: 'update-logo',
-        key: 'update-logo',
-        file: {
-            host,
-            ...file
-        },
-    } as  QueueRequest;
-    await this.queueService.handleUpload_Logo_Queue(contents);
+      name: 'update-logo',
+      key: 'update-logo',
+      file: {
+        host,
+        ...file,
+      },
+    } as QueueRequest;
+    const jobU = await this.queueService.handleUploadQueue(contents);
     // await this.queueUpload.add(QueueName.upload, file, {
     //   delay: 1000 * 3,
     //   lifo: true,

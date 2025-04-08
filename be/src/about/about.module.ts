@@ -6,9 +6,6 @@ import { AboutController } from './about.controller';
 import { AboutService } from './about.service';
 
 import { QueueModule } from 'src/queue/queue.module';
-import { BullModule } from '@nestjs/bull';
-import { QueueName } from 'src/constants/queue';
-import { UploadingConsumer } from 'src/queue/consumers/Uploading.consumer';
 
 @Module({
   imports: [
