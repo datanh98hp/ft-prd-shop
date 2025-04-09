@@ -1,12 +1,13 @@
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as path from 'path';
-import { ValidationPipe } from '@nestjs/common';
-
+import { AppModule } from './app.module';
+import { TimezoneMiddleware } from './timezone-middleware/timezone-middleware.middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  app.use(new TimezoneMiddleware().use);
   app.useGlobalPipes(new ValidationPipe());
   app.useStaticAssets(path.join(__dirname, '../upload'));
   app.enableCors({
