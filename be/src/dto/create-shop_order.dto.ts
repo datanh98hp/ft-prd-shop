@@ -13,4 +13,5 @@ export class CreateShopOrderDto {
     shippingMethod: ShippingMethod;
     order_total: number;
     order_status: OrderStatus;
+    soft_deleted: boolean;
 }

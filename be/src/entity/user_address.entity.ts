@@ -1,19 +1,27 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
-import { Address } from "./address.entity";
-import { User } from "src/entity/user.entity";
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Address } from './address.entity';
+import { User } from 'src/entity/user.entity';
 
 @Entity()
 export class UserAddress {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @OneToOne(() => User)
-    @JoinColumn()
-    user: User
-    @OneToOne(() => Address)
-    @JoinColumn()
-    country: Address
+  //   @OneToOne(() => User)
+  //   @JoinColumn()
+  @ManyToOne(() => User, (user) => user.addresses)
+  user: User;
+  @OneToOne(() => Address)
+  @JoinColumn()
+  country: Address;
 
-    @Column({nullable:true})
-    isDefault: string;
+  @Column({ nullable: true, type: 'boolean', default: false })
+  isDefault: boolean;
 }

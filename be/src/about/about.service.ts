@@ -14,7 +14,11 @@ export class AboutService {
     return await this.aboutRepo.findOneBy({ id: 1 });
   }
   async updateAbout(about: AboutDto) {
-    return await this.aboutRepo.update({ id: 1 }, about);
+    const res = this.aboutRepo.update({ id: 1 }, about);
+    if ((await res).affected > 0) {
+      return new HttpException('Update success', HttpStatus.OK);
+    }
+    return new HttpException('Update failed', HttpStatus.NOT_MODIFIED);
   }
   async updateAboutWithAttribute(data) {
     return await this.aboutRepo.update({ id: 1 }, data);

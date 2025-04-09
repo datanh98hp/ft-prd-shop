@@ -13,6 +13,7 @@ import {
   Req,
   UploadedFile,
   UploadedFiles,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { ProductFilterPaginate } from 'src/dto/ProductFilterPaginate.dto';
@@ -26,10 +27,18 @@ import {
 import { storeConfig } from 'config/store.config';
 import { Request } from 'express';
 import { Product } from 'src/entity/product.entity';
+import { Roles } from 'src/auth/roles.decorator';
+import { RolesGuard } from 'src/auth/roles.guard';
+import { Role } from 'src/auth/role.enum';
+import { AuthGuard } from 'src/auth/auth.guard';
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
+  ///
+  @UseGuards(AuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles(Role.Admin, Role.User)
   @Post()
   @UseInterceptors(
     FileFieldsInterceptor(
@@ -76,7 +85,10 @@ export class ProductController {
     });
     return prdNew;
   }
-
+  //
+  @UseGuards(AuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles(Role.Admin, Role.User)
   @Get()
   findAll(@Query() query: ProductFilterPaginate) {
     return this.productService.findAll(query);
@@ -86,17 +98,26 @@ export class ProductController {
   findOne(@Param('id') id: string) {
     return this.productService.findOne(+id);
   }
-
-  @Patch(':id')
+//
+  @UseGuards(AuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles(Role.Admin, Role.User)
+  @Put(':id')
   update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
     return this.productService.update(+id, updateProductDto);
   }
 
+  @UseGuards(AuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles(Role.Admin, Role.User)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.productService.remove(+id);
   }
   // update image product
+  @UseGuards(AuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles(Role.Admin, Role.User)
   @Put('image/:idImg')
   @UseInterceptors(
     FileInterceptor('product_image', {

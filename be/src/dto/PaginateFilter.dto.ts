@@ -18,7 +18,8 @@ export class PaginateFilter {
     userId?: string;
     // add option for Shop_cart
 
-
+    promotionId?: string;
+    productCateId?: string;
     //
     constructor(data: PaginateFilter) {
         Object.assign(this, data);

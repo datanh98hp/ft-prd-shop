@@ -8,6 +8,7 @@ import {
   Req,
   UploadedFile,
   UploadedFiles,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 
@@ -24,7 +25,10 @@ import { AboutDto } from 'src/dto/AboutDto.dto';
 import { AboutService } from './about.service';
 import { QueueRequest } from 'src/queue/request/queue.request';
 import { QueueService } from 'src/queue/queue.service';
-import { r } from '@faker-js/faker/dist/airline-CBNP41sR';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { RolesGuard } from 'src/auth/roles.guard';
+import { Role } from 'src/auth/role.enum';
+import { Roles } from 'src/auth/roles.decorator';
 
 @Controller('about')
 export class AboutController {
@@ -37,11 +41,14 @@ export class AboutController {
   async getAbout() {
     return await this.aboutService.getAbout();
   }
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles(Role.Admin)
   @Put()
   async updateAbout(@Body() about: AboutDto) {
     return await this.aboutService.updateAbout(about);
   }
+  // delete file
   removeFileExist(path: string) {
     console.log(path);
     if (fs.existsSync(path)) {
@@ -55,6 +62,11 @@ export class AboutController {
       console.log(` file not exist "${path}"`);
     }
   }
+  //
+
+  @UseGuards(AuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles(Role.Admin)
   @Put('logo')
   @UseInterceptors(
     FileInterceptor('logo', {
@@ -106,6 +118,9 @@ export class AboutController {
     return new HttpException('Update logo success', HttpStatus.OK);
   }
 
+  @UseGuards(AuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles(Role.Admin)
   @Put('banners')
   @UseInterceptors(
     FileFieldsInterceptor(
@@ -177,6 +192,9 @@ export class AboutController {
     throw new HttpException('Error', HttpStatus.BAD_REQUEST);
   }
 
+  @UseGuards(AuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles(Role.Admin)
   @Put('delete_files')
   async deleteFiles(@Body() data: { filePaths: Array<string> }) {
     const filePaths = data.filePaths;

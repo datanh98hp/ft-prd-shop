@@ -12,6 +12,7 @@ import {
   UploadedFile,
   Req,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { ProductCategoryService } from './product_category.service';
 import { CreateProductCategoryDto } from '../dto/create-product_category.dto';
@@ -20,6 +21,10 @@ import { ProductCategory } from 'src/entity/product_category.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { storeConfig } from 'config/store.config';
 import { Request } from 'express';
+import { AuthGuard } from '../auth/auth.guard';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from 'src/auth/roles.decorator';
+import { Role } from 'src/auth/role.enum';
 
 @Controller('product-category')
 export class ProductCategoryController {
@@ -27,6 +32,10 @@ export class ProductCategoryController {
     private readonly productCategoryService: ProductCategoryService,
   ) {}
 
+  //
+  @UseGuards(AuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles(Role.Admin, Role.User)
   @Post()
   @UseInterceptors(
     FileInterceptor('product_category_thumb', {
@@ -70,6 +79,9 @@ export class ProductCategoryController {
     return this.productCategoryService.findOne(+id);
   }
 
+  @UseGuards(AuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles(Role.Admin, Role.User)
   @Put(':id')
   update(
     @Param('id') id: string,
@@ -77,7 +89,11 @@ export class ProductCategoryController {
   ) {
     return this.productCategoryService.update(+id, updateProductCategoryDto);
   }
+  //
 
+  @UseGuards(AuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles(Role.Admin, Role.User)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.productCategoryService.remove(+id);

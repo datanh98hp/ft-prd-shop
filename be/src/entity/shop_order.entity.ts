@@ -50,6 +50,8 @@ export class ShopOrder {
   @ManyToOne(() => OrderStatus, (stt) => stt.orders)
   order_status: OrderStatus;
 
+  @Column({ default: false, nullable: true, type: 'boolean' })
+  soft_deleted: boolean;
   @CreateDateColumn({ nullable: true })
   created_at: Date;
   @UpdateDateColumn({ nullable: true })

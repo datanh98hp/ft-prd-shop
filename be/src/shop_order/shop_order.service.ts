@@ -81,6 +81,7 @@ export class ShopOrderService {
         shippingMethod: { id: shippingMethod },
         order_status: { id: order_status },
         user: { id: userId },
+        soft_deleted: false,
       },
       cache: true,
       take: items_per_page,
