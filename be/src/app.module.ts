@@ -24,18 +24,22 @@ import { SeedModule } from './seed/seed.module';
 
 import { QueueModule } from './queue/queue.module';
 import { BullModule } from '@nestjs/bull';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(
-      {
-        isGlobal: true,
-        envFilePath: ['.env'],
-      },
-    ),
+    // ServeStaticModule.forRoot({
+    //   rootPath: join(__dirname, '..', 'upload'),
+    //   serveRoot: '/upload',
+    // }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: ['.env'],
+    }),
     BullModule.forRoot({
       redis: {
-        host:  process.env.REDIS_HOST,
+        host: process.env.REDIS_HOST,
         port: parseInt(process.env.REDIS_PORT),
       },
     }),

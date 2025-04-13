@@ -5,9 +5,10 @@ import { Product } from "./product.entity";
 export class Brand {
     @PrimaryGeneratedColumn()
     id: number;
+    
     @Column()
     brand_name: string;
-    @Column({ nullable: true })
+    @Column({ nullable: true,default: null })
     logo: string;
 
     @OneToMany(() => Product, (prd) => prd.brand, { nullable: true })

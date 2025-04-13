@@ -25,10 +25,15 @@ import * as fs from 'fs';
 import { Roles } from 'src/auth/roles.decorator';
 import { Role } from 'src/auth/role.enum';
 import { RolesGuard } from 'src/auth/roles.guard';
+import { QueueRequest } from 'src/queue/request/queue.request';
+import { QueueService } from 'src/queue/queue.service';
 
 @Controller('brand')
 export class BrandController {
-  constructor(private brandService: BrandService) {}
+  constructor(
+    private brandService: BrandService,
+    private readonly queueService: QueueService,
+  ) {}
 
   @Get()
   findAll(@Query() query: PaginateFilter) {
@@ -40,12 +45,12 @@ export class BrandController {
     return await this.brandService.getBrand(+id);
   }
 
-  @UseGuards(RolesGuard)
-  @Roles(Role.Admin)
+  // @UseGuards(RolesGuard)
+  // @Roles(Role.Admin)
   @Post()
   @UseInterceptors(
     FileInterceptor('logo', {
-      storage: storeConfig('logo_brand'),
+      storage: storeConfig('brand'),
       fileFilter: (req, file, cb) => {
         const sizeFile = parseInt(req.headers['content-length']);
         if (sizeFile > 1024 * 1024 * 5) {
@@ -62,11 +67,29 @@ export class BrandController {
     @Req() req: any,
     @UploadedFile() file: Express.Multer.File,
   ) {
+    // console.log(createBrandDto);
+    // console.log(file);
     ///console.log(`Uploaded file "${file.originalname}"`);
-    const host = (await req).headers.host;
-    const temp = file.path.split('/');
-    const url = `${host}/${temp[1]}/${temp[2]}`;
-    return await this.brandService.create({ ...createBrandDto, logo: url });
+    try {
+      const host = (await req).headers.host;
+      const temp = file.path.split('/');
+      const url = `${req.protocol}://${host}/${temp[1]}/${temp[2]}`;
+
+      //set queue upload
+      const contents = {
+        name: 'upload-brand',
+        key: 'upload-brand',
+        file: {
+          host,
+          ...file,
+        },
+      } as QueueRequest;
+      const jobU = await this.queueService.handleUploadQueue(contents);
+      // console.log('data save', { ...createBrandDto, logo: url });
+      return await this.brandService.create({ ...createBrandDto, logo: url });
+    } catch (error) {
+      return new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   @UseGuards(RolesGuard)
@@ -74,7 +97,7 @@ export class BrandController {
   @Put(':id')
   @UseInterceptors(
     FileInterceptor('logo', {
-      storage: storeConfig('logo_brand'),
+      storage: storeConfig('brand'),
       fileFilter: (req, file, cb) => {
         const sizeFile = parseInt(req.headers['content-length']);
         if (sizeFile > 1024 * 1024 * 5) {
@@ -112,7 +135,17 @@ export class BrandController {
         }
         const host = (await req).headers.host;
         const temp = file.path.split('/');
-        const url = `${host}/${temp[1]}/${temp[2]}`;
+        const url = `${req.protocol}://${host}/${temp[3]}/${temp[4]}`;
+        //set queue upload
+        const contents = {
+          name: 'update-brand',
+          key: 'update-brand',
+          file: {
+            host,
+            ...file,
+          },
+        } as QueueRequest;
+        const jobU = await this.queueService.handleUploadQueue(contents);
         return await this.brandService.update(+id, {
           ...updateBrandDto,
           logo: url,
@@ -133,7 +166,15 @@ export class BrandController {
       const brandItem = await this.brandService.getBrand(+id);
       const logoPath = brandItem.logo;
       const tem = logoPath.split('/');
-      const path = `upload/${tem[1]}/${tem[2]}`;
+      const path = `upload/${tem[3]}/${tem[4]}`;
+      //queue remove file
+      const contents = {
+        name: 'remove-brand',
+        key: 'remove-brand',
+        data: {
+          paths: [path],
+        },
+      } as QueueRequest;
 
       fs.unlink(path, (err) => {
         if (err) {
@@ -141,6 +182,7 @@ export class BrandController {
         }
         console.log(`deleted file "${path}"`);
       });
+      const jobU = await this.queueService.handleRemoveFile(contents);
       return await this.brandService.remove(+id);
     } catch (error) {
       return new HttpException(error.message, HttpStatus.NOT_FOUND);

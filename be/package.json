@@ -30,7 +30,7 @@
     "@nestjs/mapped-types": "*",
     "@nestjs/microservices": "^10.0.1",
     "@nestjs/platform-express": "^10.0.0",
-    "@nestjs/serve-static": "^4.0.0",
+    "@nestjs/serve-static": "^4.0.2",
     "@nestjs/typeorm": "^10.0.1",
     "amqp-connection-manager": "^4.1.14",
     "amqplib": "^0.10.3",

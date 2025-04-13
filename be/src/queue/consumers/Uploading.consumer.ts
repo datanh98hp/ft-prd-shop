@@ -27,4 +27,13 @@ export class UploadingConsumer {
       }, 1000 * 3);
     });
   }
+  @Process('remove_file')
+  async handleRemoveFile(job: Job<unknown>) {
+    console.log(`Remove file in job: ${JSON.stringify(job.data)}`);
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve(job.data);
+      }, 1000 * 3);
+    });
+  }
 }

@@ -18,5 +18,10 @@ export class QueueService {
     return;
   }
   ////
-  
+  async handleRemoveFile(data: QueueRequest) {
+    // set queue upload
+    // console.log(data);
+    await this.queueUpload.add('remove_file',data, queueConfig as JobOptions);
+    return;
+  }
 }
