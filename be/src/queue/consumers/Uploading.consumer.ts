@@ -1,7 +1,7 @@
 import { Process, Processor } from '@nestjs/bull';
 import { Job } from 'bullmq';
 import { QueueName } from 'src/constants/queue';
-
+import * as fs from 'fs';
 @Processor(QueueName.upload)
 export class UploadingConsumer {
   @Process()
@@ -22,14 +22,22 @@ export class UploadingConsumer {
   async handleUpload(data: Record<string, any>) {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        console.log(`Uploaded file "${data.file.originalname}"`);
+        // console.log(`Uploaded file "${data.file.originalname}"`);
         resolve(data);
       }, 1000 * 3);
     });
   }
   @Process('remove_file')
-  async handleRemoveFile(job: Job<unknown>) {
-    console.log(`Remove file in job: ${JSON.stringify(job.data)}`);
+  async handleRemoveFile(job: Job<any>) {
+    console.log(`Remove file in job:::: ${JSON.stringify(job.data)}`);
+    const path = job.data.data.path;
+    // console.log('path::::::::', path);
+    fs.unlink(path, (err) => {
+      if (err) {
+        console.log(err);
+      }
+      console.log(`deleted file "${path}"`);
+    });
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         resolve(job.data);

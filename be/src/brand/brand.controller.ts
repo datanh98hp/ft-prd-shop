@@ -164,25 +164,33 @@ export class BrandController {
   async remove(@Param('id') id: string) {
     try {
       const brandItem = await this.brandService.getBrand(+id);
+      if (!brandItem) {
+        return new HttpException(
+          'Not found item to delete',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+      // delete old file image logo
       const logoPath = brandItem.logo;
       const tem = logoPath.split('/');
       const path = `upload/${tem[3]}/${tem[4]}`;
-      //queue remove file
+      ///queue remove file
       const contents = {
         name: 'remove-brand',
         key: 'remove-brand',
         data: {
-          paths: [path],
+          path,
         },
       } as QueueRequest;
-
-      fs.unlink(path, (err) => {
-        if (err) {
-          console.log(err);
-        }
-        console.log(`deleted file "${path}"`);
-      });
       const jobU = await this.queueService.handleRemoveFile(contents);
+     
+      // fs.unlink(path, (err) => {
+      //   if (err) {
+      //     console.log(err);
+      //   }
+      //   console.log(`deleted file "${path}"`);
+      // });
+      
       return await this.brandService.remove(+id);
     } catch (error) {
       return new HttpException(error.message, HttpStatus.NOT_FOUND);
