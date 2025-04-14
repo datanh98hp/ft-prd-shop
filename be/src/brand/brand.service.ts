@@ -53,11 +53,15 @@ export class BrandService {
     };
   }
   async getBrand(id: number): Promise<Brand> {
-    return await this.brandRepo.findOne({
+    const res = await this.brandRepo.findOne({
       where: { id },
       relations: ['products'],
       select: ['id', 'brand_name', 'logo', 'products'],
     });
+    if (!res) {
+      throw new HttpException('Not found item', HttpStatus.NOT_FOUND);
+    }
+    return res;
   }
   async create(createBrandDto: CreateBrandDto): Promise<Brand> {
     // const newBr = this.brandRepo.create(createBrandDto);

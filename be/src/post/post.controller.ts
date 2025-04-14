@@ -25,9 +25,15 @@ import { Roles } from 'src/auth/roles.decorator';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { Role } from 'src/auth/role.enum';
 import { AuthGuard } from 'src/auth/auth.guard';
+import path, { extname } from 'path';
+import { QueueRequest } from 'src/queue/request/queue.request';
+import { QueueService } from 'src/queue/queue.service';
 @Controller('post')
 export class PostController {
-  constructor(private readonly postService: PostService) {}
+  constructor(
+    private readonly postService: PostService,
+    private readonly queueService: QueueService,
+  ) {}
   @Get()
   async findAll(@Query() query: PaginateFilter) {
     return await this.postService.findAll(query);
@@ -43,9 +49,23 @@ export class PostController {
       storage: storeConfig('thumb'),
       fileFilter: (req, file, cb) => {
         const sizeFile = parseInt(req.headers['content-length']);
-        if (sizeFile > 1024 * 1024 * 10) {
+        if (file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
+          // Allow storage of file
+          cb(null, true);
+        } else {
+          // Reject file
+          cb(
+            new HttpException(
+              `Unsupported file type ${extname(file.originalname)}`,
+              HttpStatus.BAD_REQUEST,
+            ),
+            false,
+          );
+          req.fileValidate = `File type is not supported`;
+        }
+        if (sizeFile > 1024 * 1024 * 5) {
           // >5MB
-          req.fileValidate = `File must less than 10MB`;
+          req.fileValidate = `File must less than 5MB`;
         } else {
           cb(null, true);
         }
@@ -57,19 +77,48 @@ export class PostController {
     @Req() req: Request,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    //console.log(`Uploaded file "${file.originalname}"`);
-    const host = (await req).headers.host;
-    const temp = file.path.split('/');
-    const url = `${host}/${temp[1]}/${temp[2]}`;
-    //////////////
-    post.thumb = url;
-
-    return await this.postService.create(post);
+    try {
+      //console.log(`Uploaded file "${file.originalname}"`);
+      const host = (await req).headers.host;
+      const temp = file.path.split('/');
+      const url = `${req.protocol}://${host}/public/${temp[1]}/${temp[2]}`;
+      console.log(url);
+      //////////////
+      post.thumb = url;
+      post.slug = this.genSlug(post.slug);
+      //set queue upload
+      // await this.queueService.handleUploadQueue({
+      //   name: 'create-post',
+      //   key: 'create-post',
+      //   file: {
+      //     host,
+      //     ...file,
+      //   },
+      // } as QueueRequest);
+      return await this.postService.create({ ...post, thumb: url });
+    } catch (error) {
+      return new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
+  ///
+  genSlug(text: string): string {
+    return text
+      .toLowerCase()
+      .replace(/ /g, '-')
+      .replace(/[^\w-]+/g, '')
+      .replace(/--+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  }
+
+
+  //
   @Get(':id')
   async show(@Param('id') id: number) {
     return await this.postService.getPost(id);
   }
+
+
+
   ///
   @UseGuards(AuthGuard)
   @UseGuards(RolesGuard)
@@ -80,9 +129,23 @@ export class PostController {
       storage: storeConfig('thumb'),
       fileFilter: (req, file, cb) => {
         const sizeFile = parseInt(req.headers['content-length']);
-        if (sizeFile > 1024 * 1024 * 10) {
+        if (file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
+          // Allow storage of file
+          cb(null, true);
+        } else {
+          // Reject file
+          cb(
+            new HttpException(
+              `Unsupported file type ${extname(file.originalname)}`,
+              HttpStatus.BAD_REQUEST,
+            ),
+            false,
+          );
+          req.fileValidate = `File type is not supported`;
+        }
+        if (sizeFile > 1024 * 1024 * 5) {
           // >5MB
-          req.fileValidate = `File must less than 10MB`;
+          req.fileValidate = `File must less than 5MB`;
         } else {
           cb(null, true);
         }
@@ -105,9 +168,20 @@ export class PostController {
 
     const thummUrl = oldPost.thumb;
     if (thummUrl === null) {
-      this.delFileExist(thummUrl);
+      // this.delFileExist(thummUrl);
+      await this.queueService.handleRemoveFile({
+        name: 'remove_file',
+        key: 'remove_file',
+        data: {
+          path: thummUrl,
+        },
+      } as QueueRequest);
+
       const host = (await req).headers.host;
-      const updateUrlThumb = this.getUrlFromPath(host, file.path);
+      const updateUrlThumb = this.getUrlFromPath(
+        `${req.protocol}://${host}`,
+        file.path,
+      );
       console.log(updateUrlThumb);
     }
     return await this.postService.update(+id, {
@@ -131,6 +205,22 @@ export class PostController {
   @Roles(Role.Admin, Role.User)
   @Delete(':id')
   async delete(@Param('id') id: number) {
+    // delete file in server
+    const postItem = await this.postService.getPost(id);
+    if (!postItem || !postItem.thumb) {
+      return new HttpException(
+        'Not found item to delete',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    const thummUrl = postItem.thumb;
+
+    await this.queueService.handleRemoveFile({
+      name: 'remove_file',
+      key: 'remove_file',
+      data: { path: thummUrl },
+    } as QueueRequest);
+
     return await this.postService.delete(id);
   }
 
@@ -167,7 +257,7 @@ export class PostController {
   }
   private getUrlFromPath(host: string, path: string) {
     const temp = path.split('/');
-    const url = `${host}/${temp[1]}/${temp[2]}`;
+    const url = `${host}/public/${temp[1]}/${temp[2]}`;
     return url;
   }
 }

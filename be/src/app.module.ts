@@ -29,10 +29,10 @@ import { join } from 'path';
 
 @Module({
   imports: [
-    // ServeStaticModule.forRoot({
-    //   rootPath: join(__dirname, '..', 'upload'),
-    //   serveRoot: '/upload',
-    // }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'upload'),
+      serveRoot: '/public/',
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: ['.env'],

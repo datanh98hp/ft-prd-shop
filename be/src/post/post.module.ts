@@ -3,12 +3,11 @@ import { PostController } from './post.controller';
 import { PostService } from './post.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Post } from 'src/entity/post.entity';
+import { QueueModule } from 'src/queue/queue.module';
 
 @Module({
-  imports:[
-    TypeOrmModule.forFeature([Post])
-  ],
+  imports: [QueueModule, TypeOrmModule.forFeature([Post])],
   controllers: [PostController],
-  providers: [PostService]
+  providers: [PostService],
 })
 export class PostModule {}

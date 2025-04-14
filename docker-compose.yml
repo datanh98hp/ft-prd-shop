@@ -15,6 +15,7 @@ services:
     volumes:
       - ./be:/usr/src/app/
       - /usr/src/app/node_modules
+      - /usr/src/app/upload
     ports:
       - '8001:8001'
     networks:

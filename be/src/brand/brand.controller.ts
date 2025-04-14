@@ -27,6 +27,7 @@ import { Role } from 'src/auth/role.enum';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { QueueRequest } from 'src/queue/request/queue.request';
 import { QueueService } from 'src/queue/queue.service';
+import { extname } from 'path';
 
 @Controller('brand')
 export class BrandController {
@@ -45,14 +46,28 @@ export class BrandController {
     return await this.brandService.getBrand(+id);
   }
 
-  // @UseGuards(RolesGuard)
-  // @Roles(Role.Admin)
+  @UseGuards(RolesGuard)
+  @Roles(Role.Admin)
   @Post()
   @UseInterceptors(
     FileInterceptor('logo', {
       storage: storeConfig('brand'),
       fileFilter: (req, file, cb) => {
         const sizeFile = parseInt(req.headers['content-length']);
+        if (file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
+          // Allow storage of file
+          cb(null, true);
+        } else {
+          // Reject file
+          cb(
+            new HttpException(
+              `Unsupported file type ${extname(file.originalname)}`,
+              HttpStatus.BAD_REQUEST,
+            ),
+            false,
+          );
+          req.fileValidate = `File type is not supported`;
+        }
         if (sizeFile > 1024 * 1024 * 5) {
           // >5MB
           req.fileValidate = `File must less than 5MB`;
@@ -73,7 +88,7 @@ export class BrandController {
     try {
       const host = (await req).headers.host;
       const temp = file.path.split('/');
-      const url = `${req.protocol}://${host}/${temp[1]}/${temp[2]}`;
+      const url = `${req.protocol}://${host}/public/${temp[1]}/${temp[2]}`;
 
       //set queue upload
       const contents = {
@@ -100,6 +115,20 @@ export class BrandController {
       storage: storeConfig('brand'),
       fileFilter: (req, file, cb) => {
         const sizeFile = parseInt(req.headers['content-length']);
+        if (file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
+          // Allow storage of file
+          cb(null, true);
+        } else {
+          // Reject file
+          cb(
+            new HttpException(
+              `Unsupported file type ${extname(file.originalname)}`,
+              HttpStatus.BAD_REQUEST,
+            ),
+            false,
+          );
+          req.fileValidate = `File type is not supported`;
+        }
         if (sizeFile > 1024 * 1024 * 5) {
           // >5MB
           req.fileValidate = `File must less than 5MB`;
@@ -120,22 +149,38 @@ export class BrandController {
       if (file.fieldname) {
         // delete old file image logo
         const brandItem = await this.brandService.getBrand(+id);
-        const logoPath = brandItem.logo;
+
+        if (!brandItem) {
+          return new HttpException(
+            'Not found item to update',
+            HttpStatus.NOT_FOUND,
+          );
+        }
+        const logoPath = brandItem?.logo;
 
         const tem = logoPath.split('/');
-        const path = `upload/${tem[1]}/${tem[2]}`;
+        const path = `upload/${tem[3]}/${tem[4]}`;
         console.log(path);
-        if (fs.existsSync(path)) {
-          fs.unlink(path, (err) => {
-            if (err) {
-              console.log(err);
-            }
-            console.log(`deleted file "${path}"`);
-          });
-        }
+        // if (fs.existsSync(path)) {
+        //   fs.unlink(path, (err) => {
+        //     if (err) {
+        //       console.log(err);
+        //     }
+        //     console.log(`deleted file "${path}"`);
+        //   });
+        // }
+        //
+        await this.queueService.handleRemoveFile({
+          name: 'remove-brand',
+          key: 'remove-brand',
+          data: {
+            path,
+          },
+        } as QueueRequest);
+
         const host = (await req).headers.host;
         const temp = file.path.split('/');
-        const url = `${req.protocol}://${host}/${temp[3]}/${temp[4]}`;
+        const url = `${req.protocol}://${host}/public/${temp[1]}/${temp[2]}`;
         //set queue upload
         const contents = {
           name: 'update-brand',
@@ -183,14 +228,14 @@ export class BrandController {
         },
       } as QueueRequest;
       const jobU = await this.queueService.handleRemoveFile(contents);
-     
+
       // fs.unlink(path, (err) => {
       //   if (err) {
       //     console.log(err);
       //   }
       //   console.log(`deleted file "${path}"`);
       // });
-      
+
       return await this.brandService.remove(+id);
     } catch (error) {
       return new HttpException(error.message, HttpStatus.NOT_FOUND);

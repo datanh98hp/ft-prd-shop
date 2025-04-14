@@ -29,6 +29,7 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { Role } from 'src/auth/role.enum';
 import { Roles } from 'src/auth/roles.decorator';
+import { extname } from 'path';
 
 @Controller('about')
 export class AboutController {
@@ -73,6 +74,20 @@ export class AboutController {
       storage: storeConfig('logo'),
       fileFilter: (req, file, cb) => {
         const sizeFile = parseInt(req.headers['content-length']);
+        if (file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
+          // Allow storage of file
+          cb(null, true);
+        } else {
+          // Reject file
+          cb(
+            new HttpException(
+              `Unsupported file type ${extname(file.originalname)}`,
+              HttpStatus.BAD_REQUEST,
+            ),
+            false,
+          );
+          req.fileValidate = `File type is not supported`;
+        }
         if (sizeFile > 1024 * 1024 * 5) {
           // >5MB
           req.fileValidate = `File must less than 5MB`;
@@ -96,7 +111,14 @@ export class AboutController {
       const tem = logoPath.split('/');
       const path = `upload/${tem[3]}/${tem[4]}`;
 
-      this.removeFileExist(path);
+      // this.removeFileExist(path);
+      await this.queueService.handleRemoveFile({
+        name: 'remove-logo',
+        key: 'remove-logo',
+        data: {
+          path,
+        },
+      } as QueueRequest);
       await this.aboutService.updateLogo(url);
     } else {
       const update = await this.aboutService.updateLogo(url); // host/logo/{filename}
@@ -134,9 +156,23 @@ export class AboutController {
         storage: storeConfig('banners'),
         fileFilter: (req, file, cb) => {
           const sizeFile = parseInt(req.headers['content-length']);
-          if (sizeFile > 1024 * 1024 * 10) {
-            // >10MB
-            req.fileValidate = `File must less than 10MB`;
+          if (file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
+            // Allow storage of file
+            cb(null, true);
+          } else {
+            // Reject file
+            cb(
+              new HttpException(
+                `Unsupported file type ${extname(file.originalname)}`,
+                HttpStatus.BAD_REQUEST,
+              ),
+              false,
+            );
+            req.fileValidate = `File type is not supported`;
+          }
+          if (sizeFile > 1024 * 1024 * 5) {
+            // >5MB
+            req.fileValidate = `File must less than 5MB`;
           } else {
             cb(null, true);
           }
@@ -151,25 +187,31 @@ export class AboutController {
     const oldData = await this.aboutService.getAbout();
     if (oldData && oldData.banners && oldData.banners.length > 0) {
       const list = oldData.banners.split(',');
-      list.map((item) => {
+      const paths = list.map((item) => {
         const tem = item.split('/');
         const path = `upload/${tem[3]}/${tem[4]}`;
-        // console.log(path)
-        if (fs.existsSync(path)) {
-          fs.unlink(path, (err) => {
-            if (err) {
-              console.log(err);
-            }
-            console.log(`deleted file "${path}"`);
-          });
-        }
       });
+      //console.log('list file:', paths);
+      // const contents = {
+      //   name: 'remove-brand',
+      //   key: 'remove-brand',
+      //   data: {
+      //     paths,
+      //   },
+      // } as QueueRequest;
+      await this.queueService.handleRemoveListFiles({
+        name: 'remove-banners',
+        key: 'remove-banners',
+        data: {
+          paths,
+        },
+      } as QueueRequest);
 
       ////
       const host = (await req).headers.host;
 
       const listFile: Array<string> = [];
-      files.banners.map(async (item) => {
+      files.banners?.map(async (item) => {
         let temp = item.path.split('/');
         let url = `${req.protocol}://${host}/${temp[1]}/${temp[2]}`;
         listFile.push(url);
@@ -215,10 +257,22 @@ export class AboutController {
         });
         this.aboutService.updateAboutWithAttribute({ logo: '' });
       }
-      return {
-        statusCode: HttpStatus.NOT_FOUND,
-        message: 'File not exist.',
-      };
+      // return {
+      //   statusCode: HttpStatus.NOT_FOUND,
+      //   message: 'File not exist.',
+      // };
     });
+
+    await this.queueService.handleRemoveListFiles({
+      name: 'remove-banners',
+      key: 'remove-banners',
+      data: {
+        paths: filePaths,
+      },
+    } as QueueRequest);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Delete files is processing.',
+    };
   }
 }

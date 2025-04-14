@@ -32,12 +32,14 @@ export class UploadingConsumer {
     console.log(`Remove file in job:::: ${JSON.stringify(job.data)}`);
     const path = job.data.data.path;
     // console.log('path::::::::', path);
-    fs.unlink(path, (err) => {
-      if (err) {
-        console.log(err);
-      }
-      console.log(`deleted file "${path}"`);
-    });
+    if (fs.existsSync(path)) {
+      fs.unlink(path, (err) => {
+        if (err) {
+          console.log(err);
+        }
+        console.log(`deleted file "${path}"`);
+      });
+    }
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         resolve(job.data);
