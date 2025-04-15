@@ -92,7 +92,7 @@ export class ProductCategoryService {
     };
   }
 
-  async findOne(id: number) {
+  async findOne(id: number): Promise<ProductCategory | null> {
     const item = await this.productCategoryRepo.findOne({
       cache: true,
       where: { id },
@@ -110,7 +110,7 @@ export class ProductCategoryService {
       },
     });
     if (!item) {
-      return new HttpException('Not found item', HttpStatus.NOT_FOUND);
+      return null;
     }
     return item;
   }

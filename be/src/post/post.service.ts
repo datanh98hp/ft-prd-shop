@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PostDto } from 'src/dto/Post.dto';
 import { Post } from 'src/entity/post.entity';
@@ -89,7 +89,7 @@ export class PostService {
       },
     });
     if (!post) {
-      return null;
+      return new HttpException('Not found item', HttpStatus.NOT_FOUND);
     }
     return post;
   }

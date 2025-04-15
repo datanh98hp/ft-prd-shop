@@ -19,17 +19,20 @@ import { CreateProductCategoryDto } from '../dto/create-product_category.dto';
 import { UpdateProductCategoryDto } from '../dto/update-product_category.dto';
 import { ProductCategory } from 'src/entity/product_category.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { storeConfig } from 'config/store.config';
+import { fileFilterConfig, storeConfig } from 'config/store.config';
 import { Request } from 'express';
 import { AuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from 'src/auth/roles.decorator';
 import { Role } from 'src/auth/role.enum';
+import { QueueService } from 'src/queue/queue.service';
+import { QueueRequest } from 'src/queue/request/queue.request';
 
 @Controller('product-category')
 export class ProductCategoryController {
   constructor(
     private readonly productCategoryService: ProductCategoryService,
+    private readonly queueService: QueueService,
   ) {}
 
   //
@@ -40,15 +43,7 @@ export class ProductCategoryController {
   @UseInterceptors(
     FileInterceptor('product_category_thumb', {
       storage: storeConfig('product_category_thumb'),
-      fileFilter: (req, file, cb) => {
-        const sizeFile = parseInt(req.headers['content-length']);
-        if (sizeFile > 1024 * 1024 * 10) {
-          // >5MB
-          req.fileValidate = `File must less than 10MB`;
-        } else {
-          cb(null, true);
-        }
-      },
+      fileFilter: fileFilterConfig.fileFilter,
     }),
   )
   async create(
@@ -61,9 +56,17 @@ export class ProductCategoryController {
       //-- if upload success,then set url in database, else set category_img = "uploading...."
       const host = (await req).headers.host;
       const temp = file.path?.split('/');
-      const url = `${host}/${temp[1]}/${temp[2]}`;
+      const url = `${req.protocol}://${host}/public/${temp[1]}/${temp[2]}`;
       //////////////
       createProductCategoryDto.category_img = url;
+
+      await this.queueService.handleUploadQueue({
+        key: 'upload product_category',
+        name: 'upload_product_category',
+        data: {
+          file,
+        },
+      });
     }
 
     return this.productCategoryService.create(createProductCategoryDto);
@@ -82,15 +85,57 @@ export class ProductCategoryController {
   @UseGuards(AuthGuard)
   @UseGuards(RolesGuard)
   @Roles(Role.Admin, Role.User)
+  @UseInterceptors(
+    FileInterceptor('product_category_thumb', {
+      storage: storeConfig('product_category_thumb'),
+      fileFilter: fileFilterConfig.fileFilter,
+    }),
+  )
   @Put(':id')
-  update(
+  async update(
     @Param('id') id: string,
+    @Req() req: Request,
+    @UploadedFile() file: Express.Multer.File,
     @Body() updateProductCategoryDto: UpdateProductCategoryDto,
   ) {
+    //delete old image
+    const oldProductCategory = await this.productCategoryService.findOne(+id);
+    if (!oldProductCategory) {
+      return new HttpException('Not found item', HttpStatus.NOT_FOUND);
+    }
+    //update new image
+    if (updateProductCategoryDto.category_img) {
+      // delete old image in server
+      const oldPath = oldProductCategory.category_img;
+      const temp = oldPath.split('/');
+      const path = `upload/${temp[3]}/${temp[4]}`;
+      //queue remove file
+      const contents = {
+        name: 'remove-product-category',
+        key: 'remove-product-category',
+        data: {
+          path,
+        },
+      } as QueueRequest;
+      /////
+      await this.queueService.handleRemoveFile(contents);
+
+      //upload new image
+      //////////////
+      const url = `${req.protocol}://${req.headers.host}/public/${file.path}`;
+      updateProductCategoryDto.category_img = url;
+      await this.queueService.handleUploadQueue({
+        key: 'upload product_category',
+        name: 'upload_product_category',
+        data: {
+          file,
+        },
+      });
+    }
+
     return this.productCategoryService.update(+id, updateProductCategoryDto);
   }
   //
-
   @UseGuards(AuthGuard)
   @UseGuards(RolesGuard)
   @Roles(Role.Admin, Role.User)

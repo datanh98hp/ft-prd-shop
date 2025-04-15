@@ -31,6 +31,7 @@ import { Roles } from 'src/auth/roles.decorator';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { Role } from 'src/auth/role.enum';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { extname } from 'path';
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
@@ -52,12 +53,25 @@ export class ProductController {
         storage: storeConfig('product_images'),
         fileFilter: (req, file, cb) => {
           const sizeFile = parseInt(req.headers['content-length']);
-          if (sizeFile > 1024 * 1024 * 10) {
-            // >10MB
-            req.fileValidate = `File must less than 10MB`;
+          if (file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
+            // Allow storage of file
+            cb(null, true);
+          } else {
+            // Reject file
+            cb(
+              new HttpException(
+                `Unsupported file type ${extname(file.originalname)}`,
+                HttpStatus.BAD_REQUEST,
+              ),
+              false,
+            );
+            req.fileValidate = `File type is not supported`;
+          }
+          if (sizeFile > 1024 * 1024 * 5) {
+            // >5MB
+            req.fileValidate = `File must less than 5MB`;
           } else {
             cb(null, true);
-            console.log(`${file.originalname} stored.`);
           }
         },
       },
@@ -73,17 +87,21 @@ export class ProductController {
     if (!product_images_files) {
       return await this.productService.create(createProductDto);
     }
-    const prdNew = await this.productService.create(createProductDto);
-    product_images_files.map(async (img) => {
-      const temp = img.path.split('/');
-      let pathImg = temp[1] + '/' + temp[2];
-      await this.productService.createProductImage({
-        key: createProductDto.name,
-        path: pathImg,
-        product: prdNew,
+    try {
+      const prdNew = await this.productService.create(createProductDto);
+      product_images_files.map(async (img) => {
+        const temp = img.path.split('/');
+        let pathImg = temp[1] + '/' + temp[2];
+        await this.productService.createProductImage({
+          key: createProductDto.name,
+          path: pathImg,
+          product: prdNew,
+        });
       });
-    });
-    return prdNew;
+      return prdNew;
+    } catch (error) {
+      return new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
   //
   @UseGuards(AuthGuard)
@@ -98,7 +116,7 @@ export class ProductController {
   findOne(@Param('id') id: string) {
     return this.productService.findOne(+id);
   }
-//
+  //
   @UseGuards(AuthGuard)
   @UseGuards(RolesGuard)
   @Roles(Role.Admin, Role.User)
@@ -124,9 +142,23 @@ export class ProductController {
       storage: storeConfig('product_images'),
       fileFilter: (req, file, cb) => {
         const sizeFile = parseInt(req.headers['content-length']);
-        if (sizeFile > 1024 * 1024 * 10) {
+        if (file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
+          // Allow storage of file
+          cb(null, true);
+        } else {
+          // Reject file
+          cb(
+            new HttpException(
+              `Unsupported file type ${extname(file.originalname)}`,
+              HttpStatus.BAD_REQUEST,
+            ),
+            false,
+          );
+          req.fileValidate = `File type is not supported`;
+        }
+        if (sizeFile > 1024 * 1024 * 5) {
           // >5MB
-          req.fileValidate = `File must less than 10MB`;
+          req.fileValidate = `File must less than 5MB`;
         } else {
           cb(null, true);
         }

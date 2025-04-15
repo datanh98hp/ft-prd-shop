@@ -21,9 +21,9 @@ export class ProductCategory {
     updated_at: Date;
     ///
     @OneToMany(() => ProductCategory, (cate) => cate.parent_category, { nullable: true })
-    child_categories: ProductCategory[]
+    child_categories?: ProductCategory[]
     @ManyToOne(() => ProductCategory, (cate) => cate.child_categories, { nullable: true })
-    parent_category: ProductCategory;
+    parent_category?: ProductCategory;
     /////////////////////
     @ManyToOne(() => PromotionCategory, (it) => it.product_category)
     promotion_category: PromotionCategory
