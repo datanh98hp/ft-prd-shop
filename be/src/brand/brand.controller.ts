@@ -6,7 +6,6 @@ import {
   HttpException,
   HttpStatus,
   Param,
-  Patch,
   Post,
   Put,
   Query,
@@ -15,19 +14,18 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { BrandService } from './brand.service';
-import { PaginateFilter } from 'src/dto/PaginateFilter.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { storeConfig } from 'config/store.config';
-import { CreateBrandDto } from 'src/dto/create-brand.dto';
-import { UpdateBrandDto } from 'src/dto/update-brand.dto';
-import * as fs from 'fs';
-import { Roles } from 'src/auth/roles.decorator';
-import { Role } from 'src/auth/role.enum';
-import { RolesGuard } from 'src/auth/roles.guard';
-import { QueueRequest } from 'src/queue/request/queue.request';
-import { QueueService } from 'src/queue/queue.service';
 import { extname } from 'path';
+import { Role } from 'src/auth/role.enum';
+import { Roles } from 'src/auth/roles.decorator';
+import { RolesGuard } from 'src/auth/roles.guard';
+import { CreateBrandDto } from 'src/dto/create-brand.dto';
+import { PaginateFilter } from 'src/dto/PaginateFilter.dto';
+import { UpdateBrandDto } from 'src/dto/update-brand.dto';
+import { QueueService } from 'src/queue/queue.service';
+import { QueueRequest } from 'src/queue/request/queue.request';
+import { BrandService } from './brand.service';
 
 @Controller('brand')
 export class BrandController {
@@ -227,7 +225,7 @@ export class BrandController {
           path,
         },
       } as QueueRequest;
-      const jobU = await this.queueService.handleRemoveFile(contents);
+      await this.queueService.handleRemoveFile(contents);
 
       // fs.unlink(path, (err) => {
       //   if (err) {

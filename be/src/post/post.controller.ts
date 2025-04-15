@@ -87,14 +87,14 @@ export class PostController {
       post.thumb = url;
       post.slug = this.genSlug(post.slug);
       //set queue upload
-      // await this.queueService.handleUploadQueue({
-      //   name: 'create-post',
-      //   key: 'create-post',
-      //   file: {
-      //     host,
-      //     ...file,
-      //   },
-      // } as QueueRequest);
+      await this.queueService.handleUploadQueue({
+        name: 'create-post',
+        key: 'create-post',
+        file: {
+          host,
+          ...file,
+        },
+      } as QueueRequest);
       return await this.postService.create({ ...post, thumb: url });
     } catch (error) {
       return new HttpException(error.message, HttpStatus.BAD_REQUEST);
@@ -116,8 +116,6 @@ export class PostController {
   async show(@Param('id') id: number) {
     return await this.postService.getPost(id);
   }
-
-
 
   ///
   @UseGuards(AuthGuard)
