@@ -165,8 +165,9 @@ export class ProductController {
 
       let urlImg = `${req.protocol}://${req.headers.host}/public/${pathImg}`;
       //console.log('urlImg', urlImg);
-      if (fs.existsSync(pathImg)) {
-        fs.unlink(pathImg, (err) => {
+
+      if (fs.existsSync(file.path)) {
+        fs.unlink(file.path, (err) => {
           if (err) {
             console.log(err);
           }
