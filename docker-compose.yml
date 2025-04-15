@@ -35,7 +35,7 @@ services:
   #   volumes:
   #     - ./order-service:/usr/src/app/
   #     - /usr/src/app/node_modules
-   
+
   #   networks:
   #     - my_network
   # products-service:
@@ -58,7 +58,7 @@ services:
   #     - my_network
   # fe:
   #   container_name: fe
-    
+
   #   build: 
   #     context: ./fe
   #     dockerfile: ./dev.Dockerfile #path Dockerfile in container

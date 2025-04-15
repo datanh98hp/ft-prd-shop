@@ -37,23 +37,23 @@ export class FileHandleConsumer {
   ///
   @Process('remove_files')
   async handleRemoveFiles(job: Job<any>) {
-    console.log(`Remove list files in job:::: ${JSON.stringify(job.data)}`);
-    const paths = job.data.data.paths;
-    console.log('path::::::::', paths);
-    for (const path of paths) {
-      if (fs.existsSync(path)) {
-        fs.unlink(path, (err) => {
-          if (err) {
-            console.log(err);
-          }
-          console.log(`deleted file "${path}"`);
-        });
-      }
-    }
-
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         resolve(job.data);
+        console.log(`Remove list files in job:::: ${JSON.stringify(job.data)}`);
+        const paths = job.data.data.paths;
+        console.log('path::::::::', paths);
+        for (const path of paths) {
+          if (fs.existsSync(path)) {
+            fs.unlink(path, (err) => {
+              if (err) {
+                console.log(err);
+              }
+              console.log(`deleted file "${path}"`);
+            });
+          }
+          console.log(` file not exist "${path}"`);
+        }
       }, 1000 * 3);
     });
   }

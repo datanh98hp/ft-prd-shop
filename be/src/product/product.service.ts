@@ -6,15 +6,16 @@ import { Product } from '../entity/product.entity';
 import { Like, Repository } from 'typeorm';
 import { Images } from '../entity/images.entity';
 import { CreateImageProductDto } from '../dto/create-Image-product.dto';
-
-
+import { QueueService } from 'src/queue/queue.service';
 
 @Injectable()
 export class ProductService {
   constructor(
-    @InjectRepository(Product) private readonly productRepo: Repository<Product>,
-    @InjectRepository(Images) private readonly productImageRepo: Repository<Images>,
-  ) { }
+    @InjectRepository(Product)
+    private readonly productRepo: Repository<Product>,
+    @InjectRepository(Images)
+    private readonly productImageRepo: Repository<Images>,
+  ) {}
 
   async create(createProductDto: CreateProductDto): Promise<Product> {
     const newPrd = this.productRepo.create(createProductDto);
@@ -45,46 +46,43 @@ export class ProductService {
       order: {
         created_at: sortBy === 'DESC' ? 'DESC' : 'ASC',
       },
-      where:
-      {
+      where: {
         name: keyword ? Like(`%${keyword}%`) : null,
         category: { id: product_cate_id },
       },
       cache: true,
       take: items_per_page,
       skip: skip,
-      relations:
-      {
+      relations: {
         items: true,
         brand: true,
         category: {
           variations: true,
           promotion_category: {
-            promotion: true
-          }
+            promotion: true,
+          },
         },
-        product_images: true
+        product_images: true,
       },
-      select:
-      {
+      select: {
         items: {
           id: true,
-          qty_in_stock: true
+          qty_in_stock: true,
         },
         product_images: {
-          path: true
+          path: true,
         },
-        brand:{
-            brand_name:true
-        }
-      }
+        brand: {
+          brand_name: true,
+        },
+      },
     });
     const lastPage = Math.ceil(total / items_per_page);
 
     const nextPage = page + 1 ? null : page + 1;
 
     const previousPage = page - 1 < 1 ? null : page - 1;
-    
+
     return {
       data: res,
       total,
@@ -93,42 +91,37 @@ export class ProductService {
       previousPage,
       lastPage,
     };
-
   }
 
-  async findOne(id: number) {
+  async findOne(id: number): Promise<Product | any> {
     try {
       const item = await this.productRepo.findOne({
         where: { id },
-        relations:
-        {
+        relations: {
           items: true,
           category: {
             variations: true,
             promotion_category: {
-              promotion: true
-            }
+              promotion: true,
+            },
           },
 
-          product_images: true
+          product_images: true,
         },
-        select:{
+        select: {
           items: {
             id: true,
-            qty_in_stock: true
-          }
-        }
+            qty_in_stock: true,
+          },
+        },
       });
-      if (item) {
-        return item ;
+      if (!item) {
+        return new HttpException('Not found item', HttpStatus.NOT_FOUND);
       }
-      return {
-        message: 'Not found item'
-      }
+      return item;
     } catch (error) {
       return new HttpException('Error', HttpStatus.BAD_REQUEST);
     }
-
   }
 
   async update(id: number, updateProductDto: UpdateProductDto) {
@@ -138,9 +131,8 @@ export class ProductService {
         return await this.productRepo.update(id, updateProductDto);
       }
       return {
-        message: 'Not found item to update'
-      }
-
+        message: 'Not found item to update',
+      };
     } catch (error) {
       return new HttpException('Error', HttpStatus.BAD_REQUEST);
     }
@@ -150,9 +142,11 @@ export class ProductService {
     try {
       return await this.productRepo.delete(id);
     } catch (error) {
-      return new HttpException('Can not delete this product, that product have items', HttpStatus.NOT_FOUND);
+      return new HttpException(
+        'Can not delete this product, that product have items',
+        HttpStatus.NOT_FOUND,
+      );
     }
-
   }
   //////////////// PRODUCT IMAGE
 
@@ -163,7 +157,7 @@ export class ProductService {
       if (itemNew) {
         return itemNew;
       }
-      return {}
+      return {};
     } catch (error) {
       throw new HttpException('error', HttpStatus.BAD_REQUEST);
     }
@@ -178,5 +172,23 @@ export class ProductService {
     } catch (error) {
       throw new HttpException('Error', HttpStatus.BAD_REQUEST);
     }
+  }
+
+  async deleteImageProduct(idImgs: number[]) {
+    try {
+      for (const id of idImgs) {
+        const item = await this.productImageRepo.findOneBy({ id: id });
+        if (item) {
+          await this.productImageRepo.delete(id);
+        }
+      }
+    } catch (error) {
+      throw new HttpException('Error', HttpStatus.BAD_REQUEST);
+    }
+  }
+  async getImageProduct(id: number) {
+    return await this.productImageRepo.findOne({
+      where: { id },
+    });
   }
 }

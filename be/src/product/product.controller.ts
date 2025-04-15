@@ -6,7 +6,6 @@ import {
   HttpException,
   HttpStatus,
   Param,
-  Patch,
   Post,
   Put,
   Query,
@@ -16,25 +15,29 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import {
+  FileFieldsInterceptor,
+  FileInterceptor,
+  FilesInterceptor,
+} from '@nestjs/platform-express';
+import { fileFilterConfig, storeConfig } from 'config/store.config';
+import { Request } from 'express';
+import * as fs from 'fs';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { Role } from 'src/auth/role.enum';
+import { Roles } from 'src/auth/roles.decorator';
+import { RolesGuard } from 'src/auth/roles.guard';
 import { ProductFilterPaginate } from 'src/dto/ProductFilterPaginate.dto';
 import { CreateProductDto } from '../dto/create-product.dto';
 import { UpdateProductDto } from '../dto/update-product.dto';
 import { ProductService } from './product.service';
-import {
-  FileFieldsInterceptor,
-  FileInterceptor,
-} from '@nestjs/platform-express';
-import { storeConfig } from 'config/store.config';
-import { Request } from 'express';
-import { Product } from 'src/entity/product.entity';
-import { Roles } from 'src/auth/roles.decorator';
-import { RolesGuard } from 'src/auth/roles.guard';
-import { Role } from 'src/auth/role.enum';
-import { AuthGuard } from 'src/auth/auth.guard';
-import { extname } from 'path';
+import { QueueService } from 'src/queue/queue.service';
 @Controller('product')
 export class ProductController {
-  constructor(private readonly productService: ProductService) {}
+  constructor(
+    private readonly productService: ProductService,
+    private readonly queueService: QueueService,
+  ) {}
 
   ///
   @UseGuards(AuthGuard)
@@ -51,29 +54,7 @@ export class ProductController {
       ],
       {
         storage: storeConfig('product_images'),
-        fileFilter: (req, file, cb) => {
-          const sizeFile = parseInt(req.headers['content-length']);
-          if (file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
-            // Allow storage of file
-            cb(null, true);
-          } else {
-            // Reject file
-            cb(
-              new HttpException(
-                `Unsupported file type ${extname(file.originalname)}`,
-                HttpStatus.BAD_REQUEST,
-              ),
-              false,
-            );
-            req.fileValidate = `File type is not supported`;
-          }
-          if (sizeFile > 1024 * 1024 * 5) {
-            // >5MB
-            req.fileValidate = `File must less than 5MB`;
-          } else {
-            cb(null, true);
-          }
-        },
+        fileFilter: fileFilterConfig.fileFilter,
       },
     ),
   )
@@ -92,9 +73,10 @@ export class ProductController {
       product_images_files.map(async (img) => {
         const temp = img.path.split('/');
         let pathImg = temp[1] + '/' + temp[2];
+        let urlImg = `${req.protocol}://${req.headers.host}/public/${pathImg}`;
         await this.productService.createProductImage({
           key: createProductDto.name,
-          path: pathImg,
+          path: urlImg,
           product: prdNew,
         });
       });
@@ -104,17 +86,15 @@ export class ProductController {
     }
   }
   //
-  @UseGuards(AuthGuard)
-  @UseGuards(RolesGuard)
-  @Roles(Role.Admin, Role.User)
+
   @Get()
   findAll(@Query() query: ProductFilterPaginate) {
     return this.productService.findAll(query);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.productService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    return await this.productService.findOne(+id);
   }
   //
   @UseGuards(AuthGuard)
@@ -129,7 +109,30 @@ export class ProductController {
   @UseGuards(RolesGuard)
   @Roles(Role.Admin, Role.User)
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string) {
+    //remove image product
+    const item = await this.productService.findOne(+id);
+    if (!item) {
+      return new HttpException('Not found item', HttpStatus.NOT_FOUND);
+    }
+    const images = item.product_images;
+
+    if (images.length > 0) {
+      const paths = images.map((img) => {
+        const temp = img.path.split('/');
+        const pathImg = `${temp[3]}/${temp[4]}`;
+        return pathImg;
+      });
+      //set queue remove imagess
+      await this.queueService.handleRemoveListFiles({
+        name: 'remove-product-images',
+        key: 'remove-product-images',
+        data: {
+          paths,
+        },
+      });
+    }
+
     return this.productService.remove(+id);
   }
   // update image product
@@ -138,41 +141,95 @@ export class ProductController {
   @Roles(Role.Admin, Role.User)
   @Put('image/:idImg')
   @UseInterceptors(
-    FileInterceptor('product_image', {
+    FilesInterceptor('product_images', 5, {
       storage: storeConfig('product_images'),
-      fileFilter: (req, file, cb) => {
-        const sizeFile = parseInt(req.headers['content-length']);
-        if (file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
-          // Allow storage of file
-          cb(null, true);
-        } else {
-          // Reject file
-          cb(
-            new HttpException(
-              `Unsupported file type ${extname(file.originalname)}`,
-              HttpStatus.BAD_REQUEST,
-            ),
-            false,
-          );
-          req.fileValidate = `File type is not supported`;
-        }
-        if (sizeFile > 1024 * 1024 * 5) {
-          // >5MB
-          req.fileValidate = `File must less than 5MB`;
-        } else {
-          cb(null, true);
-        }
-      },
+      fileFilter: fileFilterConfig.fileFilter,
     }),
   )
   async updateImageProduct(
     @Param('idImg') idImg: string,
-    @UploadedFile() file: { product_image: Express.Multer.File },
+    @Req() req: Request,
+    @UploadedFiles() files: Array<Express.Multer.File>,
   ) {
-    const temp = file.product_image.path.split('/');
-    let pathImg = temp[1] + '/' + temp[2];
-    await this.productService.updateImageProduct(+idImg, { path: pathImg });
+    console.log('idImg', idImg);
+    console.log('file', files);
+    if (!files || files.length === 0) {
+      return new HttpException('No image provided', HttpStatus.BAD_REQUEST);
+    }
+    const pathsImg = [];
+    for (const file of files) {
+      // console.log('file', file);
+      const temp = file.path.split('/');
+      let pathImg = temp[1] + '/' + temp[2];
+      pathsImg.push(pathImg);
 
-    return await pathImg;
+      let urlImg = `${req.protocol}://${req.headers.host}/public/${pathImg}`;
+      //console.log('urlImg', urlImg);
+      if (fs.existsSync(pathImg)) {
+        fs.unlink(pathImg, (err) => {
+          if (err) {
+            console.log(err);
+          }
+          console.log(`deleted file "${pathImg}"`);
+        });
+      }
+      await this.productService.updateImageProduct(+idImg, { path: urlImg });
+    }
+    console.log('pathsImg', pathsImg);
+    //set queue remove imagess
+    // await this.queueService.handleRemoveListFiles({
+    //   name: 'remove-product-images',
+    //   key: 'remove-product-images',
+    //   data: {
+    //     paths: pathsImg,
+    //   },
+    // });
+  }
+  ////
+
+  @UseGuards(AuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles(Role.Admin, Role.User)
+  @Put('image/:idImg')
+  @UseInterceptors(
+    FileInterceptor('product_image', {
+      storage: storeConfig('product_images'),
+      fileFilter: fileFilterConfig.fileFilter,
+    }),
+  )
+
+  //delete image product
+  @UseGuards(AuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles(Role.Admin, Role.User)
+  @Put('image/delete')
+  async deleteImageProduct(@Body() idImgs: number[], @Req() req: Request) {
+    if (idImgs.length === 0) {
+      return new HttpException('No image provided', HttpStatus.BAD_REQUEST);
+    }
+
+    for (const id of idImgs) {
+      const item = await this.productService.getImageProduct(id);
+      if (!item) {
+        return new HttpException(`Image ${id} not found`, HttpStatus.NOT_FOUND);
+      }
+      const temp = item.path.split('/');
+      //const pathImg = `${req.protocol}://${req.headers.host}/public/${temp[3]}/${temp[4]}`;
+      const pathImg = `${temp[3]}/${temp[4]}`;
+      await this.queueService.handleRemoveListFiles({
+        name: 'remove-product-images',
+        key: 'remove-product-images',
+        data: {
+          path: pathImg,
+        },
+      });
+    }
+    return await this.productService.deleteImageProduct(idImgs);
+  }
+
+  getUrlImage(req: Request, pathImg: string) {
+    const temp = pathImg.split('/');
+    //const pathImg = `${req.protocol}://${req.headers.host}/public/${temp[3]}/${temp[4]}`;
+    return `${req.protocol}://${req.headers.host}/public/${temp[1]}/${temp[2]}`;
   }
 }
