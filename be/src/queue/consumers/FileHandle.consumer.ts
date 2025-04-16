@@ -40,6 +40,7 @@ export class FileHandleConsumer {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         resolve(job.data);
+
         console.log(`Remove list files in job:::: ${JSON.stringify(job.data)}`);
         const paths = job.data.data.paths;
         console.log('path::::::::', paths);
@@ -51,8 +52,9 @@ export class FileHandleConsumer {
               }
               console.log(`deleted file "${path}"`);
             });
+          } else {
+            console.log(` file not exist "${path}"`);
           }
-          console.log(` file not exist "${path}"`);
         }
       }, 1000 * 3);
     });

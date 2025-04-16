@@ -104,7 +104,7 @@ export class ProductController {
   update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
     return this.productService.update(+id, updateProductDto);
   }
-
+  ///////////////
   @UseGuards(AuthGuard)
   @UseGuards(RolesGuard)
   @Roles(Role.Admin, Role.User)
@@ -116,14 +116,16 @@ export class ProductController {
       return new HttpException('Not found item', HttpStatus.NOT_FOUND);
     }
     const images = item.product_images;
+    // console.log('images---------', images);
 
     if (images.length > 0) {
       const paths = images.map((img) => {
         const temp = img.path.split('/');
-        const pathImg = `${temp[3]}/${temp[4]}`;
+        const pathImg = `upload/${temp[4]}/${temp[5]}`;
         return pathImg;
       });
-      //set queue remove imagess
+      console.log('paths', paths);
+      /// set queue remove imagess
       await this.queueService.handleRemoveListFiles({
         name: 'remove-product-images',
         key: 'remove-product-images',
@@ -188,44 +190,39 @@ export class ProductController {
   }
   ////
 
-  @UseGuards(AuthGuard)
-  @UseGuards(RolesGuard)
-  @Roles(Role.Admin, Role.User)
-  @Put('image/:idImg')
-  @UseInterceptors(
-    FileInterceptor('product_image', {
-      storage: storeConfig('product_images'),
-      fileFilter: fileFilterConfig.fileFilter,
-    }),
-  )
-
   //delete image product
   @UseGuards(AuthGuard)
   @UseGuards(RolesGuard)
   @Roles(Role.Admin, Role.User)
-  @Put('image/delete')
-  async deleteImageProduct(@Body() idImgs: number[], @Req() req: Request) {
+  @Post('/image-delete')
+  async deleteImageProduct(@Body() { idImgs }: { idImgs: number[] }) {
     if (idImgs.length === 0) {
       return new HttpException('No image provided', HttpStatus.BAD_REQUEST);
     }
-
+    const pathImgs = [];
     for (const id of idImgs) {
       const item = await this.productService.getImageProduct(id);
       if (!item) {
-        return new HttpException(`Image ${id} not found`, HttpStatus.NOT_FOUND);
+        console.log(`Image ${id} not found`);
+      } else {
+        const temp = item.path.split('/');
+        //const pathImg = `${req.protocol}://${req.headers.host}/public/${temp[3]}/${temp[4]}`;
+        const pathImg = `upload/${temp[4]}/${temp[5]}`;
+        pathImgs.push(pathImg);
       }
-      const temp = item.path.split('/');
-      //const pathImg = `${req.protocol}://${req.headers.host}/public/${temp[3]}/${temp[4]}`;
-      const pathImg = `${temp[3]}/${temp[4]}`;
+    }
+    if (pathImgs.length !== 0) {
+      await this.productService.deleteImageProduct(pathImgs);
       await this.queueService.handleRemoveListFiles({
         name: 'remove-product-images',
         key: 'remove-product-images',
         data: {
-          path: pathImg,
+          paths: pathImgs,
         },
       });
+      return await this.productService.deleteImageProduct(idImgs);
     }
-    return await this.productService.deleteImageProduct(idImgs);
+    return new HttpException('No image path provided', HttpStatus.BAD_REQUEST);
   }
 
   getUrlImage(req: Request, pathImg: string) {

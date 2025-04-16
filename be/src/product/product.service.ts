@@ -177,13 +177,14 @@ export class ProductService {
   async deleteImageProduct(idImgs: number[]) {
     try {
       for (const id of idImgs) {
-        const item = await this.productImageRepo.findOneBy({ id: id });
-        if (item) {
-          await this.productImageRepo.delete(id);
+        const item = await this.productImageRepo.findOneBy({ id: +id });
+        if (!item) {
+          console.log(`Item ${id} not found`);
         }
+        await this.productImageRepo.delete(+id);
       }
     } catch (error) {
-      throw new HttpException('Error', HttpStatus.BAD_REQUEST);
+      return new HttpException(error.messsage, HttpStatus.BAD_REQUEST);
     }
   }
   async getImageProduct(id: number) {
