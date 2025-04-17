@@ -13,7 +13,7 @@ export class ProductItem {
     @Column({default:0})
     qty_in_stock: number;
     @Column({nullable:true})
-    product_images?: string;
+    product_images?: string; // list images split by ","
     @Column({default:0})
     price: number;
     @ManyToOne(() => Product, (prd) => prd.items)

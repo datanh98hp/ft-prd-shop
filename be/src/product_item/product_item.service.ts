@@ -175,14 +175,19 @@ export class ProductItemService {
   // }
   async findOne(id: number) {
     try {
-      return await this.productItemRepo.findOne({
+      return await this.productItemRepo.findOneOrFail({
         where: { id },
+        cache: true,
         relations:
         {
-          cart_items: true,
-          order_lines: true,
+          // cart_items: true,
+          // order_lines: true,
           product_configurations: {
-            variation_option: true
+            variation_option: {
+              variation: {
+                options: true,
+              },
+            }
           }
         }
       });
@@ -214,6 +219,16 @@ export class ProductItemService {
       throw new HttpException('Can not delete this product, that product have items', HttpStatus.NOT_FOUND);
     }
   }
+
+  //add product_item image
+  async addImageProductItem(id: number, image: string) {
+    try {
+      
+    } catch (error) {
+      throw new HttpException('Error', HttpStatus.BAD_REQUEST);
+    }
+  }
+
 
   // product_configuration
   async listVariationOptions() {

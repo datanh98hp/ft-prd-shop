@@ -62,6 +62,7 @@ export class ProductService {
             promotion: true,
           },
         },
+        
         product_images: true,
       },
       select: {
