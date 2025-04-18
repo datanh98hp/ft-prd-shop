@@ -9,6 +9,7 @@ import {
   Query,
   UseGuards,
   Put,
+  UseInterceptors,
 } from '@nestjs/common';
 import { VariationService } from './variation.service';
 import { CreateVariationDto } from '../dto/create-variation.dto';
@@ -18,8 +19,10 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { Role } from 'src/auth/role.enum';
 import { Roles } from 'src/auth/roles.decorator';
 import { RolesGuard } from 'src/auth/roles.guard';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @Controller('variation')
+@UseInterceptors(CacheInterceptor)
 export class VariationController {
   constructor(private readonly variationService: VariationService) {}
 

@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors } from '@nestjs/common';
 import { VariationOptionService } from './variation_option.service';
 import { CreateVariationOptionDto } from '../dto/create-variation_option.dto';
 import { UpdateVariationOptionDto } from '../dto/update-variation_option.dto';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @Controller('variation-option')
+@UseInterceptors(CacheInterceptor)
 export class VariationOptionController {
   constructor(private readonly variationOptionService: VariationOptionService) {}
 

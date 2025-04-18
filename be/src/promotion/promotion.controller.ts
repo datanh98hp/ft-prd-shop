@@ -9,6 +9,7 @@ import {
   Query,
   Put,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { PromotionService } from './promotion.service';
 import { CreatePromotionDto } from '../dto/create-promotion.dto';
@@ -19,8 +20,10 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { Role } from 'src/auth/role.enum';
 import { Roles } from 'src/auth/roles.decorator';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @Controller('promotion')
+@UseInterceptors(CacheInterceptor)
 export class PromotionController {
   constructor(private readonly promotionService: PromotionService) {}
 

@@ -26,12 +26,17 @@ import { QueueModule } from './queue/queue.module';
 import { BullModule } from '@nestjs/bull';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 
 @Module({
   imports: [
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'upload'),
       serveRoot: '/public/',
+    }),
+    CacheModule.register({
+      isGlobal: true,
     }),
     ConfigModule.forRoot({
       isGlobal: true,
@@ -84,6 +89,12 @@ import { join } from 'path';
     QueueModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: CacheInterceptor,
+    },
+  ],
 })
 export class AppModule {}

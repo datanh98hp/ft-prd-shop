@@ -8,6 +8,7 @@ import {
   Put,
   Query,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CreatePromotionCategoryDto } from '../dto/create-promotion_category.dto';
 import { UpdatePromotionCategoryDto } from '../dto/update-promotion_category.dto';
@@ -16,8 +17,10 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { Role } from 'src/auth/role.enum';
 import { Roles } from 'src/auth/roles.decorator';
 import { RolesGuard } from 'src/auth/roles.guard';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @Controller('promotion-category')
+@UseInterceptors(CacheInterceptor)
 export class PromotionCategoryController {
   constructor(
     private readonly promotionCategoryService: PromotionCategoryService,

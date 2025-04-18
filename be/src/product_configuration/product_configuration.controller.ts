@@ -10,6 +10,7 @@ import {
   Query,
   Put,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ProductConfigurationService } from './product_configuration.service';
 import { CreateProductConfigurationDto } from '../dto/create-product_configuration.dto';
@@ -19,8 +20,10 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { Role } from 'src/auth/role.enum';
 import { Roles } from 'src/auth/roles.decorator';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @Controller('product-configuration')
+@UseInterceptors(CacheInterceptor)
 export class ProductConfigurationController {
   constructor(
     private readonly productConfigurationService: ProductConfigurationService,

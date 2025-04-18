@@ -27,8 +27,10 @@ import { Roles } from 'src/auth/roles.decorator';
 import { Role } from 'src/auth/role.enum';
 import { QueueService } from 'src/queue/queue.service';
 import { QueueRequest } from 'src/queue/request/queue.request';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @Controller('product-category')
+@UseInterceptors(CacheInterceptor)
 export class ProductCategoryController {
   constructor(
     private readonly productCategoryService: ProductCategoryService,

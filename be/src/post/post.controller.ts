@@ -28,7 +28,9 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import path, { extname } from 'path';
 import { QueueRequest } from 'src/queue/request/queue.request';
 import { QueueService } from 'src/queue/queue.service';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 @Controller('post')
+@UseInterceptors(CacheInterceptor)
 export class PostController {
   constructor(
     private readonly postService: PostService,
