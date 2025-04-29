@@ -60,7 +60,7 @@ export class ShopOrderService {
 
     const skip = (page - 1) * items_per_page;
 
-    const sortBy = query.sortBy; //'DESC' || "ASC"
+    const sortBy = query.sortBy || 'DESC'; //'DESC' || "ASC"
     const order_status = Number(query.order_status) || null;
     const shippingMethod = Number(query.shippingMethod) || null;
     const payment_method = Number(query.payment_method) || null;

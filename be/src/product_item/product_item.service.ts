@@ -33,7 +33,7 @@ export class ProductItemService {
 
     const skip = (page - 1) * items_per_page;
 
-    const sortBy: string = query.sortBy; //'DESC' || "ASC"
+    const sortBy: string = query.sortBy || "DESC"; //'DESC' || "ASC"
 
     const sku = query.sku || null;
     /// filter by

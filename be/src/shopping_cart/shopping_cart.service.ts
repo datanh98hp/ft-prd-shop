@@ -23,7 +23,7 @@ export class ShoppingCartService {
   ) {}
   async create(createShoppingCartDto: CreateShoppingCartDto) {
     // check user cart id exist
-    console.log(createShoppingCartDto.user);
+    //console.log(createShoppingCartDto.user);
     try {
       const userCart = await this.shoppingCartRepo.findOne({
         where: { user: { id: createShoppingCartDto.user.id } },
@@ -143,10 +143,14 @@ export class ShoppingCartService {
     });
   }
   async getCartByUser(idUser: number) {
-    return await this.shoppingCartRepo.findOne({
+    const res = await this.shoppingCartRepo.findOne({
       where: { user: { id: idUser } },
       relations: { items: { product_item: { product: true } } },
     });
+    if (!res) {
+      return new HttpException('Not found item', HttpStatus.NOT_FOUND);
+    }
+    return res;
   }
   async update(id: number, updateShoppingCartDto: UpdateShoppingCartDto) {}
   async updateItem(idItem: number, qty: number) {
